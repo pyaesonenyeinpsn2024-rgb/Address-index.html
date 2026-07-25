@@ -1,419 +1,1073 @@
 <!DOCTYPE html>
 <html lang="my">
-<head><meta charset="UTF-8">
-
-<link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
-
-<style>
-body{
-    font-family: "Padauk", sans-serif;
-}
-</style>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#065f46">
-  <title>Contact Auto-Save QR</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#065f46" />
+  <title>Contact QR Manager</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet" />
 
   <style>
-    body { font-family: "Padauk", sans-serif; background:#f1f5f9; }
-    #qr-reader { border:0 !important; color:white; }
-    #qr-reader video { border-radius:16px; }
-    #qr-reader button, #qr-reader select {
-      color:#0f172a !important; background:white !important;
-      border-radius:10px !important; padding:8px 10px !important;
-      font-size:12px !important; font-weight:700 !important;
+    :root {
+      color-scheme: light;
+    }
+
+    html.dark {
+      color-scheme: dark;
+    }
+
+    body {
+      font-family: "Padauk", sans-serif;
+    }
+
+    .soft-scrollbar::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    .soft-scrollbar::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 999px;
+    }
+
+    #qr-reader {
+      border: 0 !important;
+      color: inherit;
+    }
+
+    #qr-reader video {
+      border-radius: 16px;
+    }
+
+    #qr-reader button,
+    #qr-reader select {
+      color: #0f172a !important;
+      background: white !important;
+      border-radius: 10px !important;
+      padding: 8px 10px !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+
+    .fade-in {
+      animation: fadeIn .2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 
-<body class="min-h-screen pb-12">
-<header class="sticky top-0 z-40 bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white shadow-lg">
-  <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-3 min-w-0">
-      <div class="bg-white/10 border border-white/20 p-2.5 rounded-xl">
-        <i class="fa-solid fa-address-card text-2xl text-emerald-300"></i>
-      </div>
-      <div class="min-w-0">
-        <h1 class="font-bold text-base sm:text-lg truncate">Contact Auto-Save QR</h1>
-        <p class="text-xs text-emerald-200">QR Scan ဖတ်ပြီး Contact ထဲ Save လုပ်နိုင်သည်</p>
-      </div>
-    </div>
-    <button onclick="downloadVCard()" class="bg-amber-400 text-slate-900 font-bold text-xs px-3 py-2 rounded-xl">
-      <i class="fa-solid fa-user-plus"></i> Save
-    </button>
-  </div>
-</header>
-
-<main class="max-w-2xl mx-auto px-4 mt-5 space-y-5">
-  <div class="grid grid-cols-3 gap-1.5 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
-    <button id="btn-vcard" onclick="switchTab('vcard')" class="tab active py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-emerald-600 text-white">
-      <i class="fa-solid fa-qrcode"></i> vCard QR
-    </button>
-    <button id="btn-scan" onclick="switchTab('scan')" class="tab py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-600">
-      <i class="fa-solid fa-camera"></i> QR ဖတ်မည်
-    </button>
-    <button id="btn-edit" onclick="switchTab('edit')" class="tab py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-600">
-      <i class="fa-solid fa-pen"></i> QR ပြင်မည်
-    </button>
-  </div>
-
-  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-2xl max-w-[90%]"></div>
-
-  <section id="sec-vcard" class="space-y-4">
-    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-xs sm:text-sm text-emerald-900">
-      ဖုန်း Camera ဖြင့် QR Code ကို Scan ဖတ်ပြီး <strong>Add to Contacts</strong> ကိုနှိပ်ပါ။
-    </div>
-
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-      <div class="inline-block bg-white p-4 rounded-2xl border shadow-sm mb-4">
-        <div id="qrcode-main"></div>
-      </div>
-      <h2 id="display-name" class="font-bold text-slate-800"></h2>
-      <p class="text-xs text-slate-500 mb-4">vCard 3.0 Contact QR Code</p>
-
-      <div class="flex flex-col sm:flex-row gap-2.5">
-        <button onclick="downloadVCard()" class="flex-1 bg-emerald-600 text-white font-bold text-sm py-3 rounded-xl">
-          <i class="fa-solid fa-download"></i> .VCF Save မည်
-        </button>
-        <button onclick="shareContact()" class="bg-slate-800 text-white font-bold text-sm py-3 px-5 rounded-xl">
-          <i class="fa-solid fa-share-nodes"></i> Share
-        </button>
-      </div>
-    </div>
-
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
-      <h3 class="font-bold text-sm border-b pb-2">Contact အချက်အလက်များ</h3>
-      <div id="info-list"></div>
-    </div>
-  </section>
-
-  <section id="sec-scan" class="hidden space-y-4">
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <h2 class="font-bold text-center">QR Code Scan ဖတ်မည်</h2>
-      <p class="text-xs text-slate-500 text-center mb-4">Camera သို့မဟုတ် ပုံဖိုင်မှ Scan ဖတ်ပါ</p>
-
-      <div class="bg-slate-900 rounded-2xl overflow-hidden max-w-sm mx-auto min-h-[250px] flex items-center">
-        <div id="qr-reader" class="w-full"></div>
-      </div>
-
-      <div class="mt-4 flex flex-col sm:flex-row gap-2.5 justify-center">
-        <button onclick="startScanner()" class="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold">
-          <i class="fa-solid fa-camera"></i> Camera ဖွင့်မည်
-        </button>
-        <label class="cursor-pointer bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold text-center">
-          <i class="fa-solid fa-image"></i> ပုံဖိုင်တင်မည်
-          <input type="file" accept="image/*" class="hidden" onchange="scanFromFile(event)">
-        </label>
-      </div>
-    </div>
-
-    <div id="scan-result-card" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <h3 class="font-bold text-sm border-b pb-2 mb-3">Scan Result</h3>
-      <pre id="scan-result" class="whitespace-pre-wrap break-all bg-slate-50 p-3 rounded-xl text-xs"></pre>
-      <div id="scan-actions" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3"></div>
-    </div>
-  </section>
-
-  <section id="sec-edit" class="hidden">
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-      <h2 class="font-bold border-b pb-3">Contact QR ပြင်ဆင်မည်</h2>
-
-      <label class="block text-xs font-bold">အမည်
-        <input id="input-name" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" type="text">
-      </label>
-      <label class="block text-xs font-bold">Main Phone / KBZ Pay
-        <input id="input-phone" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" type="tel">
-      </label>
-      <label class="block text-xs font-bold">Viber Phone
-        <input id="input-viber" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" type="tel">
-      </label>
-      <label class="block text-xs font-bold">KBZ Special Bank Account
-        <input id="input-kbz" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" type="text">
-      </label>
-      <label class="block text-xs font-bold">နေရပ်လိပ်စာ
-        <input id="input-address" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" type="text">
-      </label>
-
-      <button onclick="applyData()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl">
-        <i class="fa-solid fa-arrows-rotate"></i> QR Code အသစ်ထုတ်မည်
-      </button>
-    </div>
-  </section>
-</main>
-
-<script>
-let contact = {
-  name: "Ko Pyae Sone (PYAESONENYEIN)",
-  phone: "09264888995",
-  viber: "09784888995",
-  kbz: "40251199912610001",
-  address: "MyothitKyi Quarter, Myitkyina."
-};
-
-let scanner = null;
-
-document.addEventListener("DOMContentLoaded", () => {
-  renderAll();
-  fillForm();
-});
-
-function esc(value) {
-  return String(value || "")
-    .replace(/\\/g, "\\\\")
-    .replace(/\n/g, "\\n")
-    .replace(/,/g, "\\,")
-    .replace(/;/g, "\\;");
-}
-
-function vcardText(data) {
-  const note = `KBZ Special Account: ${data.kbz}\nKBZ Pay: ${data.phone}\nViber: ${data.viber}`;
-  return [
-    "BEGIN:VCARD",
-    "VERSION:3.0",
-    `FN:${esc(data.name)}`,
-    `N:;${esc(data.name)};;;`,
-    `TEL;TYPE=CELL,VOICE:${data.phone}`,
-    `TEL;TYPE=WORK,VOICE:${data.viber}`,
-    `ADR;TYPE=HOME:;;${esc(data.address)};;;;`,
-    `NOTE:${esc(note)}`,
-    "END:VCARD"
-  ].join("\r\n");
-}
-
-function renderAll() {
-  const qr = document.getElementById("qrcode-main");
-  qr.innerHTML = "";
-  new QRCode(qr, {
-    text: vcardText(contact),
-    width: 210,
-    height: 210,
-    colorDark: "#064e3b",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.M
-  });
-
-  document.getElementById("display-name").textContent = contact.name;
-
-  const items = [
-    ["fa-user", "အမည်", contact.name],
-    ["fa-phone", "KBZ Pay / Phone", contact.phone],
-    ["fa-comments", "Viber Phone", contact.viber],
-    ["fa-building-columns", "KBZ Bank Account", contact.kbz],
-    ["fa-location-dot", "နေရပ်လိပ်စာ", contact.address]
-  ];
-
-  document.getElementById("info-list").innerHTML = items.map((x, i) => `
-    <div class="flex items-center justify-between gap-2 p-2.5 bg-slate-50 rounded-xl">
-      <div class="flex items-center gap-2.5 min-w-0">
-        <i class="fa-solid ${x[0]} text-slate-400 w-4"></i>
+<body class="bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen">
+  <header class="sticky top-0 z-40 bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white shadow-lg">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="bg-white/10 border border-white/20 p-2.5 rounded-xl shrink-0">
+          <i class="fa-solid fa-address-book text-2xl text-emerald-300"></i>
+        </div>
         <div class="min-w-0">
-          <span class="block text-[10px] text-slate-400">${x[1]}</span>
-          <span id="info-${i}" class="font-bold text-sm break-all">${x[2]}</span>
+          <h1 class="font-bold text-base sm:text-xl truncate">Contact QR Manager</h1>
+          <p class="text-xs text-emerald-200">Contact သိမ်းဆည်းခြင်း၊ QR ဖန်တီးခြင်းနှင့် စကင်ဖတ်ခြင်း</p>
         </div>
       </div>
-      <button onclick="copyInfo(${i})" class="text-emerald-600 font-bold text-xs">Copy</button>
+
+      <div class="flex items-center gap-2">
+        <button id="theme-btn" type="button" onclick="toggleTheme()"
+          class="bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl w-10 h-10">
+          <i id="theme-icon" class="fa-solid fa-moon"></i>
+        </button>
+
+        <button type="button" onclick="openContactModal()"
+          class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-xs sm:text-sm px-3 py-2.5 rounded-xl">
+          <i class="fa-solid fa-user-plus"></i>
+          <span class="hidden sm:inline">Contact အသစ်</span>
+        </button>
+      </div>
     </div>
-  `).join("");
-}
+  </header>
 
-function fillForm() {
-  document.getElementById("input-name").value = contact.name;
-  document.getElementById("input-phone").value = contact.phone;
-  document.getElementById("input-viber").value = contact.viber;
-  document.getElementById("input-kbz").value = contact.kbz;
-  document.getElementById("input-address").value = contact.address;
-}
+  <main class="max-w-6xl mx-auto px-4 py-5 space-y-5">
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <p class="text-xs text-slate-500 dark:text-slate-400">Contact စုစုပေါင်း</p>
+        <p id="stat-total" class="text-2xl font-bold mt-1">0</p>
+      </div>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <p class="text-xs text-slate-500 dark:text-slate-400">အကြိုက်ဆုံး</p>
+        <p id="stat-favorite" class="text-2xl font-bold mt-1">0</p>
+      </div>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <p class="text-xs text-slate-500 dark:text-slate-400">QR စကင်ရလဒ်</p>
+        <p id="stat-scans" class="text-2xl font-bold mt-1">0</p>
+      </div>
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <p class="text-xs text-slate-500 dark:text-slate-400">Backup အခြေအနေ</p>
+        <p class="text-sm font-bold mt-2 text-emerald-600">LocalStorage</p>
+      </div>
+    </section>
 
-async function switchTab(tab) {
-  ["vcard","scan","edit"].forEach(x => {
-    document.getElementById(`sec-${x}`).classList.add("hidden");
-    const b = document.getElementById(`btn-${x}`);
-    b.className = "tab py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-600";
+    <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 shadow-sm">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+        <button id="tab-contacts" onclick="switchMainTab('contacts')" class="main-tab bg-emerald-600 text-white rounded-xl py-2.5 text-xs sm:text-sm font-bold">
+          <i class="fa-solid fa-users"></i> Contacts
+        </button>
+        <button id="tab-qr" onclick="switchMainTab('qr')" class="main-tab text-slate-600 dark:text-slate-300 rounded-xl py-2.5 text-xs sm:text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i class="fa-solid fa-qrcode"></i> QR
+        </button>
+        <button id="tab-scan" onclick="switchMainTab('scan')" class="main-tab text-slate-600 dark:text-slate-300 rounded-xl py-2.5 text-xs sm:text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i class="fa-solid fa-camera"></i> Scan
+        </button>
+        <button id="tab-import" onclick="switchMainTab('import')" class="main-tab text-slate-600 dark:text-slate-300 rounded-xl py-2.5 text-xs sm:text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i class="fa-solid fa-file-import"></i> Import
+        </button>
+        <button id="tab-backup" onclick="switchMainTab('backup')" class="main-tab text-slate-600 dark:text-slate-300 rounded-xl py-2.5 text-xs sm:text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i class="fa-solid fa-cloud-arrow-down"></i> Backup
+        </button>
+      </div>
+    </section>
+
+    <section id="sec-contacts" class="main-section space-y-4 fade-in">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex flex-col md:flex-row gap-3">
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input id="search-input" oninput="renderContacts()" type="search"
+              placeholder="အမည်၊ ဖုန်း၊ လိပ်စာဖြင့် ရှာဖွေပါ"
+              class="w-full pl-10 pr-3 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+
+          <select id="sort-select" onchange="renderContacts()"
+            class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-3 text-sm">
+            <option value="newest">အသစ်ဆုံး</option>
+            <option value="oldest">အဟောင်းဆုံး</option>
+            <option value="name">အမည် A-Z</option>
+            <option value="favorite">အကြိုက်ဆုံး ဦးစားပေး</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="contacts-empty" class="hidden bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-10 text-center">
+        <i class="fa-solid fa-address-book text-5xl text-slate-300 dark:text-slate-700"></i>
+        <h2 class="font-bold mt-4">Contact မရှိသေးပါ</h2>
+        <p class="text-sm text-slate-500 mt-1">Contact အသစ်ဖန်တီးရန် အပေါ်ရှိခလုတ်ကို နှိပ်ပါ။</p>
+      </div>
+
+      <div id="contacts-grid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+    </section>
+
+    <section id="sec-qr" class="main-section hidden fade-in">
+      <div class="grid lg:grid-cols-[340px_1fr] gap-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h2 class="font-bold">QR ထုတ်မည့် Contact</h2>
+          <select id="qr-contact-select" onchange="renderSelectedQR()"
+            class="w-full mt-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-3 text-sm"></select>
+
+          <div class="mt-4 space-y-2">
+            <button onclick="downloadSelectedVCard()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl">
+              <i class="fa-solid fa-file-arrow-down"></i> .VCF သိမ်းမည်
+            </button>
+            <button onclick="shareSelectedContact()" class="w-full bg-slate-800 text-white font-bold py-3 rounded-xl">
+              <i class="fa-solid fa-share-nodes"></i> မျှဝေမည်
+            </button>
+            <button onclick="downloadQRImage()" class="w-full bg-amber-400 text-slate-900 font-bold py-3 rounded-xl">
+              <i class="fa-solid fa-image"></i> QR PNG သိမ်းမည်
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm text-center">
+          <div class="inline-block bg-white p-4 rounded-2xl border shadow-sm">
+            <div id="selected-qrcode"></div>
+          </div>
+          <h2 id="selected-name" class="font-bold text-lg mt-4"></h2>
+          <p id="selected-phone" class="text-sm text-slate-500 dark:text-slate-400"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-scan" class="main-section hidden fade-in space-y-4">
+      <div class="grid lg:grid-cols-2 gap-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h2 class="font-bold">QR Code စကင်ဖတ်မည်</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ကင်မရာ သို့မဟုတ် ပုံဖိုင်ကို အသုံးပြုနိုင်ပါသည်။</p>
+
+          <div class="mt-4 bg-slate-950 rounded-2xl min-h-[280px] overflow-hidden flex items-center">
+            <div id="qr-reader" class="w-full"></div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+            <button onclick="startScanner()" class="bg-emerald-600 text-white py-3 rounded-xl font-bold text-sm">
+              <i class="fa-solid fa-camera"></i> ကင်မရာဖွင့်မည်
+            </button>
+            <label class="cursor-pointer bg-slate-800 text-white py-3 rounded-xl font-bold text-sm text-center">
+              <i class="fa-solid fa-image"></i> ပုံဖိုင်ရွေးမည်
+              <input type="file" accept="image/*" class="hidden" onchange="scanFromFile(event)" />
+            </label>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h2 class="font-bold">စကင်ဖတ်ရလဒ်</h2>
+          <pre id="scan-result" class="mt-4 min-h-[180px] whitespace-pre-wrap break-all bg-slate-50 dark:bg-slate-950 rounded-xl p-4 text-xs overflow-auto soft-scrollbar">ရလဒ်မရှိသေးပါ။</pre>
+          <div id="scan-action-buttons" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-import" class="main-section hidden fade-in">
+      <div class="grid lg:grid-cols-2 gap-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h2 class="font-bold">CSV Import</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+            Column အစဉ်: name, phone, viber, kbz, address, email, organization
+          </p>
+
+          <div class="mt-4 space-y-3">
+            <button onclick="downloadCSVTemplate()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold">
+              <i class="fa-solid fa-download"></i> CSV နမူနာဖိုင်
+            </button>
+
+            <label class="block cursor-pointer bg-emerald-600 text-white py-3 rounded-xl font-bold text-center">
+              <i class="fa-solid fa-file-csv"></i> CSV ဖိုင်ရွေးမည်
+              <input type="file" accept=".csv,text/csv" class="hidden" onchange="importCSV(event)" />
+            </label>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h2 class="font-bold">CSV Export</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+            လက်ရှိ Contact အားလုံးကို CSV ဖိုင်အဖြစ် ထုတ်ယူနိုင်ပါသည်။
+          </p>
+
+          <button onclick="exportCSV()" class="w-full mt-4 bg-amber-400 text-slate-900 py-3 rounded-xl font-bold">
+            <i class="fa-solid fa-file-export"></i> Contacts CSV ထုတ်မည်
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-backup" class="main-section hidden fade-in">
+      <div class="grid lg:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h2 class="font-bold">JSON Backup</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Contact နှင့် App Setting များကို Backup ယူပါ။</p>
+          <button onclick="downloadBackup()" class="w-full mt-4 bg-emerald-600 text-white py-3 rounded-xl font-bold">
+            <i class="fa-solid fa-download"></i> Backup သိမ်းမည်
+          </button>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <h2 class="font-bold">Restore</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">ယခင် Backup ဖိုင်ကို ပြန်သွင်းပါ။</p>
+          <label class="block cursor-pointer w-full mt-4 bg-slate-800 text-white py-3 rounded-xl font-bold text-center">
+            <i class="fa-solid fa-upload"></i> Backup ဖိုင်ရွေးမည်
+            <input type="file" accept=".json,application/json" class="hidden" onchange="restoreBackup(event)" />
+          </label>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900 rounded-2xl p-5 shadow-sm">
+          <h2 class="font-bold text-red-600">Data အားလုံးဖျက်မည်</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">ဤလုပ်ဆောင်ချက်ကို ပြန်မရနိုင်ပါ။</p>
+          <button onclick="clearAllData()" class="w-full mt-4 bg-red-600 text-white py-3 rounded-xl font-bold">
+            <i class="fa-solid fa-trash"></i> အားလုံးဖျက်မည်
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="contact-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 p-4 overflow-y-auto">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="w-full max-w-xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-5 fade-in">
+        <div class="flex items-center justify-between">
+          <h2 id="modal-title" class="font-bold text-lg">Contact အသစ်</h2>
+          <button onclick="closeContactModal()" class="w-9 h-9 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form id="contact-form" onsubmit="saveContact(event)" class="mt-4 grid sm:grid-cols-2 gap-3">
+          <input id="edit-id" type="hidden" />
+
+          <label class="sm:col-span-2 text-xs font-bold">
+            အမည် *
+            <input id="field-name" required class="mt-1 w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl px-3 py-2.5 text-sm" />
+          </label>
+
+          <label class="text-xs font-bold">
+            ဖုန်းနံပါတ် *
+            <input id="field-phone" required type="tel" class="mt-1 w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl px-3 py-2.5 text-sm" />
+          </label>
+
+          <label class="text-xs font-bold">
+            Viber
+            <input id="field-viber" type="tel" class="mt-1 w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl px-3 py-2.5 text-sm" />
+          </label>
+
+          <label class="text-xs font-bold">
+            Email
+            <input id="field-email" type="email" class="mt-1 w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl px-3 py-2.5 text-sm" />
+          </label>
+
+          <label class="text-xs font-bold">
+            Organization
+            <input id="field-organization" class="mt-1 w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl px-3 py-2.5 text-sm" />
+          </label>
+
+          <label class="sm:col-span-2 text-xs font-bold">
+            KBZ Bank Account
+            <input id="field-kbz" class="mt-1 w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl px-3 py-2.5 text-sm" />
+          </label>
+
+          <label class="sm:col-span-2 text-xs font-bold">
+            လိပ်စာ
+            <textarea id="field-address" rows="2" class="mt-1 w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl px-3 py-2.5 text-sm"></textarea>
+          </label>
+
+          <label class="sm:col-span-2 text-xs font-bold">
+            မှတ်ချက်
+            <textarea id="field-note" rows="2" class="mt-1 w-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 rounded-xl px-3 py-2.5 text-sm"></textarea>
+          </label>
+
+          <div class="sm:col-span-2 flex gap-2 pt-2">
+            <button type="button" onclick="closeContactModal()" class="flex-1 bg-slate-200 dark:bg-slate-800 py-3 rounded-xl font-bold">
+              ပယ်ဖျက်မည်
+            </button>
+            <button type="submit" class="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-bold">
+              သိမ်းမည်
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white text-sm px-5 py-3 rounded-2xl shadow-2xl max-w-[90%]"></div>
+
+<script>
+  const STORAGE_KEY = "contact_qr_manager_contacts_v2";
+  const SETTINGS_KEY = "contact_qr_manager_settings_v2";
+  const SCAN_KEY = "contact_qr_manager_scan_count_v2";
+
+  let contacts = [];
+  let scanner = null;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadData();
+    applySavedTheme();
+    renderAll();
   });
 
-  if (tab !== "scan") await stopScanner();
+  function uid() {
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
 
-  document.getElementById(`sec-${tab}`).classList.remove("hidden");
-  document.getElementById(`btn-${tab}`).className =
-    "tab py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-emerald-600 text-white";
-
-  if (tab === "edit") fillForm();
-}
-
-function safeName(name) {
-  return (name || "contact").replace(/[<>:"/\\|?*]+/g, "").replace(/\s+/g, "_");
-}
-
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1200);
-}
-
-function downloadVCard() {
-  downloadBlob(
-    new Blob([vcardText(contact)], {type:"text/vcard;charset=utf-8"}),
-    `${safeName(contact.name)}.vcf`
-  );
-  toast("Contact .VCF ဖိုင် Save ပြီးပါပြီ။");
-}
-
-async function shareContact() {
-  const file = new File([vcardText(contact)], `${safeName(contact.name)}.vcf`, {type:"text/vcard"});
-  try {
-    if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-      await navigator.share({title:contact.name, text:"Contact File", files:[file]});
-    } else if (navigator.share) {
-      await navigator.share({
-        title: contact.name,
-        text: `Name: ${contact.name}\nPhone: ${contact.phone}\nViber: ${contact.viber}\nKBZ: ${contact.kbz}\nAddress: ${contact.address}`
-      });
-    } else {
-      await copyText(vcardText(contact));
-      toast("Contact Data ကို Copy ကူးထားပါသည်။");
+  function loadData() {
+    try {
+      contacts = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    } catch {
+      contacts = [];
     }
-  } catch (e) {
-    if (e.name !== "AbortError") toast("Share မလုပ်နိုင်ပါ။");
-  }
-}
 
-function applyData() {
-  const name = document.getElementById("input-name").value.trim();
-  const phone = document.getElementById("input-phone").value.trim();
-
-  if (!name || !phone) {
-    toast("အမည်နှင့် ဖုန်းနံပါတ် ထည့်ပါ။");
-    return;
-  }
-
-  contact = {
-    name,
-    phone,
-    viber: document.getElementById("input-viber").value.trim(),
-    kbz: document.getElementById("input-kbz").value.trim(),
-    address: document.getElementById("input-address").value.trim()
-  };
-
-  renderAll();
-  switchTab("vcard");
-  toast("QR Code အသစ်ထုတ်ပြီးပါပြီ။");
-}
-
-async function copyText(text) {
-  if (navigator.clipboard && window.isSecureContext) {
-    return navigator.clipboard.writeText(text);
-  }
-  const t = document.createElement("textarea");
-  t.value = text;
-  t.style.position = "fixed";
-  t.style.opacity = "0";
-  document.body.appendChild(t);
-  t.select();
-  document.execCommand("copy");
-  t.remove();
-}
-
-async function copyInfo(i) {
-  await copyText(document.getElementById(`info-${i}`).textContent);
-  toast("Copy ကူးပြီးပါပြီ။");
-}
-
-function toast(message) {
-  const el = document.getElementById("toast");
-  el.textContent = message;
-  el.classList.remove("hidden");
-  clearTimeout(window.toastTimer);
-  window.toastTimer = setTimeout(() => el.classList.add("hidden"), 2500);
-}
-
-async function stopScanner() {
-  if (!scanner) return;
-  try { await scanner.clear(); } catch(e) {}
-  scanner = null;
-  document.getElementById("qr-reader").innerHTML = "";
-}
-
-async function startScanner() {
-  if (!window.isSecureContext) {
-    toast("Camera သုံးရန် HTTPS Website ဖြင့်ဖွင့်ပါ။");
-    return;
+    if (!contacts.length) {
+      contacts = [{
+        id: uid(),
+        name: "Ko Pyae Sone (PYAESONENYEIN)",
+        phone: "09264888995",
+        viber: "09784888995",
+        email: "",
+        organization: "",
+        kbz: "40251199912610001",
+        address: "MyothitKyi Quarter, Myitkyina.",
+        note: "",
+        favorite: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      }];
+      saveData();
+    }
   }
 
-  await stopScanner();
-  scanner = new Html5QrcodeScanner("qr-reader", {
-    fps:10,
-    qrbox:{width:220,height:220},
-    rememberLastUsedCamera:true,
-    showTorchButtonIfSupported:true
-  }, false);
-
-  scanner.render(async text => {
-    showScanResult(text);
-    await stopScanner();
-    toast("QR Code ဖတ်ပြီးပါပြီ။");
-  }, () => {});
-}
-
-async function scanFromFile(event) {
-  const file = event.target.files && event.target.files[0];
-  if (!file) return;
-
-  let holder = document.getElementById("file-scanner");
-  if (!holder) {
-    holder = document.createElement("div");
-    holder.id = "file-scanner";
-    holder.style.display = "none";
-    document.body.appendChild(holder);
+  function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
   }
 
-  const reader = new Html5Qrcode("file-scanner");
-  try {
-    const text = await reader.scanFile(file, true);
-    showScanResult(text);
-    toast("ပုံထဲမှ QR Code ဖတ်ပြီးပါပြီ။");
-  } catch(e) {
-    toast("ပုံထဲတွင် QR Code မတွေ့ပါ။");
-  } finally {
-    try { await reader.clear(); } catch(e) {}
-    event.target.value = "";
+  function getSettings() {
+    try {
+      return JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+    } catch {
+      return {};
+    }
   }
-}
 
-function showScanResult(text) {
-  document.getElementById("scan-result-card").classList.remove("hidden");
-  document.getElementById("scan-result").textContent = text;
+  function saveSettings(settings) {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }
 
-  const actions = document.getElementById("scan-actions");
-  actions.innerHTML = "";
+  function applySavedTheme() {
+    const settings = getSettings();
+    const dark = settings.theme === "dark";
+    document.documentElement.classList.toggle("dark", dark);
+    document.getElementById("theme-icon").className = dark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+  }
 
-  const copyBtn = document.createElement("button");
-  copyBtn.className = "bg-slate-800 text-white py-2.5 rounded-xl text-xs font-bold";
-  copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Result Copy ကူးမည်';
-  copyBtn.onclick = async () => { await copyText(text); toast("Copy ကူးပြီးပါပြီ။"); };
-  actions.appendChild(copyBtn);
+  function toggleTheme() {
+    const dark = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", dark);
+    document.getElementById("theme-icon").className = dark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    saveSettings({ ...getSettings(), theme: dark ? "dark" : "light" });
+  }
 
-  if (text.trim().toUpperCase().startsWith("BEGIN:VCARD")) {
-    const saveBtn = document.createElement("button");
-    saveBtn.className = "bg-emerald-600 text-white py-2.5 rounded-xl text-xs font-bold";
-    saveBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Contact .VCF Save မည်';
-    saveBtn.onclick = () => {
-      downloadBlob(new Blob([text], {type:"text/vcard;charset=utf-8"}), "scanned-contact.vcf");
-      toast("Contact ဖိုင် Save ပြီးပါပြီ။");
+  function renderAll() {
+    renderContacts();
+    renderStats();
+    populateQRSelect();
+  }
+
+  function renderStats() {
+    document.getElementById("stat-total").textContent = contacts.length;
+    document.getElementById("stat-favorite").textContent = contacts.filter(c => c.favorite).length;
+    document.getElementById("stat-scans").textContent = Number(localStorage.getItem(SCAN_KEY) || 0);
+  }
+
+  function switchMainTab(tab) {
+    document.querySelectorAll(".main-section").forEach(el => el.classList.add("hidden"));
+    document.querySelectorAll(".main-tab").forEach(btn => {
+      btn.className = "main-tab text-slate-600 dark:text-slate-300 rounded-xl py-2.5 text-xs sm:text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800";
+    });
+
+    document.getElementById(`sec-${tab}`).classList.remove("hidden");
+    document.getElementById(`tab-${tab}`).className = "main-tab bg-emerald-600 text-white rounded-xl py-2.5 text-xs sm:text-sm font-bold";
+
+    if (tab !== "scan") stopScanner();
+    if (tab === "qr") renderSelectedQR();
+  }
+
+  function filteredContacts() {
+    const query = document.getElementById("search-input")?.value.trim().toLowerCase() || "";
+    const sort = document.getElementById("sort-select")?.value || "newest";
+
+    let list = contacts.filter(c => {
+      const haystack = [c.name, c.phone, c.viber, c.email, c.organization, c.address, c.kbz]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(query);
+    });
+
+    list.sort((a, b) => {
+      if (sort === "oldest") return a.createdAt - b.createdAt;
+      if (sort === "name") return a.name.localeCompare(b.name);
+      if (sort === "favorite") return Number(b.favorite) - Number(a.favorite) || b.updatedAt - a.updatedAt;
+      return b.updatedAt - a.updatedAt;
+    });
+
+    return list;
+  }
+
+  function renderContacts() {
+    const list = filteredContacts();
+    const grid = document.getElementById("contacts-grid");
+    const empty = document.getElementById("contacts-empty");
+
+    empty.classList.toggle("hidden", list.length > 0);
+    grid.innerHTML = list.map(contactCardHTML).join("");
+  }
+
+  function contactCardHTML(c) {
+    return `
+      <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold truncate">${escapeHTML(c.name)}</h3>
+              ${c.favorite ? '<i class="fa-solid fa-star text-amber-400 text-xs"></i>' : ''}
+            </div>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">${escapeHTML(c.phone)}</p>
+            ${c.organization ? `<p class="text-xs text-slate-400 mt-1">${escapeHTML(c.organization)}</p>` : ""}
+          </div>
+
+          <button onclick="toggleFavorite('${c.id}')" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800">
+            <i class="${c.favorite ? "fa-solid" : "fa-regular"} fa-star ${c.favorite ? "text-amber-400" : ""}"></i>
+          </button>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button onclick="quickQR('${c.id}')" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 py-2.5 rounded-xl text-xs font-bold">
+            <i class="fa-solid fa-qrcode"></i> QR
+          </button>
+          <button onclick="downloadVCardById('${c.id}')" class="bg-slate-100 dark:bg-slate-800 py-2.5 rounded-xl text-xs font-bold">
+            <i class="fa-solid fa-download"></i> VCF
+          </button>
+          <button onclick="editContact('${c.id}')" class="bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 py-2.5 rounded-xl text-xs font-bold">
+            <i class="fa-solid fa-pen"></i> ပြင်မည်
+          </button>
+          <button onclick="deleteContact('${c.id}')" class="bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 py-2.5 rounded-xl text-xs font-bold">
+            <i class="fa-solid fa-trash"></i> ဖျက်မည်
+          </button>
+        </div>
+      </article>
+    `;
+  }
+
+  function openContactModal() {
+    document.getElementById("contact-form").reset();
+    document.getElementById("edit-id").value = "";
+    document.getElementById("modal-title").textContent = "Contact အသစ်";
+    document.getElementById("contact-modal").classList.remove("hidden");
+  }
+
+  function closeContactModal() {
+    document.getElementById("contact-modal").classList.add("hidden");
+  }
+
+  function editContact(id) {
+    const c = contacts.find(x => x.id === id);
+    if (!c) return;
+
+    document.getElementById("modal-title").textContent = "Contact ပြင်ဆင်မည်";
+    document.getElementById("edit-id").value = c.id;
+    document.getElementById("field-name").value = c.name || "";
+    document.getElementById("field-phone").value = c.phone || "";
+    document.getElementById("field-viber").value = c.viber || "";
+    document.getElementById("field-email").value = c.email || "";
+    document.getElementById("field-organization").value = c.organization || "";
+    document.getElementById("field-kbz").value = c.kbz || "";
+    document.getElementById("field-address").value = c.address || "";
+    document.getElementById("field-note").value = c.note || "";
+    document.getElementById("contact-modal").classList.remove("hidden");
+  }
+
+  function saveContact(event) {
+    event.preventDefault();
+
+    const id = document.getElementById("edit-id").value;
+    const existing = contacts.find(c => c.id === id);
+
+    const data = {
+      id: id || uid(),
+      name: document.getElementById("field-name").value.trim(),
+      phone: document.getElementById("field-phone").value.trim(),
+      viber: document.getElementById("field-viber").value.trim(),
+      email: document.getElementById("field-email").value.trim(),
+      organization: document.getElementById("field-organization").value.trim(),
+      kbz: document.getElementById("field-kbz").value.trim(),
+      address: document.getElementById("field-address").value.trim(),
+      note: document.getElementById("field-note").value.trim(),
+      favorite: existing?.favorite || false,
+      createdAt: existing?.createdAt || Date.now(),
+      updatedAt: Date.now()
     };
-    actions.appendChild(saveBtn);
+
+    if (!data.name || !data.phone) {
+      showToast("အမည်နှင့် ဖုန်းနံပါတ် ထည့်သွင်းပါ။");
+      return;
+    }
+
+    if (existing) {
+      contacts = contacts.map(c => c.id === id ? data : c);
+    } else {
+      contacts.unshift(data);
+    }
+
+    saveData();
+    closeContactModal();
+    renderAll();
+    showToast("Contact သိမ်းဆည်းပြီးပါပြီ။");
   }
-}
+
+  function deleteContact(id) {
+    const c = contacts.find(x => x.id === id);
+    if (!c) return;
+    if (!confirm(`"${c.name}" ကို ဖျက်မည်လား?`)) return;
+
+    contacts = contacts.filter(x => x.id !== id);
+    saveData();
+    renderAll();
+    showToast("Contact ဖျက်ပြီးပါပြီ။");
+  }
+
+  function toggleFavorite(id) {
+    contacts = contacts.map(c => c.id === id ? { ...c, favorite: !c.favorite, updatedAt: Date.now() } : c);
+    saveData();
+    renderAll();
+  }
+
+  function populateQRSelect(selectedId) {
+    const select = document.getElementById("qr-contact-select");
+    if (!select) return;
+
+    const current = selectedId || select.value || contacts[0]?.id || "";
+    select.innerHTML = contacts.map(c => `<option value="${c.id}">${escapeHTML(c.name)} — ${escapeHTML(c.phone)}</option>`).join("");
+
+    if (contacts.some(c => c.id === current)) select.value = current;
+    renderSelectedQR();
+  }
+
+  function quickQR(id) {
+    switchMainTab("qr");
+    populateQRSelect(id);
+  }
+
+  function selectedContact() {
+    return contacts.find(c => c.id === document.getElementById("qr-contact-select")?.value) || contacts[0];
+  }
+
+  function renderSelectedQR() {
+    const c = selectedContact();
+    const box = document.getElementById("selected-qrcode");
+    if (!box) return;
+
+    box.innerHTML = "";
+
+    if (!c) {
+      document.getElementById("selected-name").textContent = "Contact မရှိပါ";
+      document.getElementById("selected-phone").textContent = "";
+      return;
+    }
+
+    new QRCode(box, {
+      text: generateVCard(c),
+      width: 240,
+      height: 240,
+      colorDark: "#064e3b",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+
+    document.getElementById("selected-name").textContent = c.name;
+    document.getElementById("selected-phone").textContent = c.phone;
+  }
+
+  function escapeVCard(value) {
+    return String(value || "")
+      .replace(/\\/g, "\\\\")
+      .replace(/\n/g, "\\n")
+      .replace(/,/g, "\\,")
+      .replace(/;/g, "\\;");
+  }
+
+  function generateVCard(c) {
+    const lines = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      `FN:${escapeVCard(c.name)}`,
+      `N:;${escapeVCard(c.name)};;;`,
+      `TEL;TYPE=CELL,VOICE:${c.phone}`
+    ];
+
+    if (c.viber) lines.push(`TEL;TYPE=WORK,VOICE:${c.viber}`);
+    if (c.email) lines.push(`EMAIL;TYPE=INTERNET:${c.email}`);
+    if (c.organization) lines.push(`ORG:${escapeVCard(c.organization)}`);
+    if (c.address) lines.push(`ADR;TYPE=HOME:;;${escapeVCard(c.address)};;;;`);
+
+    const note = [
+      c.kbz ? `KBZ Account: ${c.kbz}` : "",
+      c.viber ? `Viber: ${c.viber}` : "",
+      c.note || ""
+    ].filter(Boolean).join("\n");
+
+    if (note) lines.push(`NOTE:${escapeVCard(note)}`);
+    lines.push("END:VCARD");
+
+    return lines.join("\r\n");
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1200);
+  }
+
+  function safeName(name) {
+    return (name || "contact").replace(/[<>:"/\\|?*]+/g, "").replace(/\s+/g, "_");
+  }
+
+  function downloadVCardById(id) {
+    const c = contacts.find(x => x.id === id);
+    if (!c) return;
+    downloadContactVCard(c);
+  }
+
+  function downloadSelectedVCard() {
+    const c = selectedContact();
+    if (c) downloadContactVCard(c);
+  }
+
+  function downloadContactVCard(c) {
+    downloadBlob(
+      new Blob([generateVCard(c)], { type: "text/vcard;charset=utf-8" }),
+      `${safeName(c.name)}.vcf`
+    );
+    showToast(".VCF ဖိုင် သိမ်းပြီးပါပြီ။");
+  }
+
+  async function shareSelectedContact() {
+    const c = selectedContact();
+    if (!c) return;
+
+    const file = new File([generateVCard(c)], `${safeName(c.name)}.vcf`, { type: "text/vcard" });
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ title: c.name, text: "Contact File", files: [file] });
+      } else if (navigator.share) {
+        await navigator.share({
+          title: c.name,
+          text: `အမည်: ${c.name}\nဖုန်း: ${c.phone}\nViber: ${c.viber || ""}\nလိပ်စာ: ${c.address || ""}`
+        });
+      } else {
+        await copyText(generateVCard(c));
+        showToast("Contact အချက်အလက်ကို ကူးယူပြီးပါပြီ။");
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") showToast("မျှဝေ၍ မရပါ။");
+    }
+  }
+
+  function downloadQRImage() {
+    const c = selectedContact();
+    const canvas = document.querySelector("#selected-qrcode canvas");
+    const img = document.querySelector("#selected-qrcode img");
+    if (!c || (!canvas && !img)) return;
+
+    const link = document.createElement("a");
+    link.download = `${safeName(c.name)}-qr.png`;
+    link.href = canvas ? canvas.toDataURL("image/png") : img.src;
+    link.click();
+    showToast("QR PNG သိမ်းပြီးပါပြီ။");
+  }
+
+  async function stopScanner() {
+    if (!scanner) return;
+    try { await scanner.clear(); } catch {}
+    scanner = null;
+    document.getElementById("qr-reader").innerHTML = "";
+  }
+
+  async function startScanner() {
+    if (!window.isSecureContext) {
+      showToast("Camera အသုံးပြုရန် HTTPS ဖြင့်ဖွင့်ပါ။");
+      return;
+    }
+
+    await stopScanner();
+
+    scanner = new Html5QrcodeScanner("qr-reader", {
+      fps: 10,
+      qrbox: { width: 230, height: 230 },
+      rememberLastUsedCamera: true,
+      showTorchButtonIfSupported: true
+    }, false);
+
+    scanner.render(async text => {
+      showScanResult(text);
+      await stopScanner();
+    }, () => {});
+  }
+
+  async function scanFromFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    let holder = document.getElementById("file-scanner");
+    if (!holder) {
+      holder = document.createElement("div");
+      holder.id = "file-scanner";
+      holder.style.display = "none";
+      document.body.appendChild(holder);
+    }
+
+    const reader = new Html5Qrcode("file-scanner");
+
+    try {
+      const text = await reader.scanFile(file, true);
+      showScanResult(text);
+    } catch {
+      showToast("ပုံဖိုင်ထဲတွင် QR Code မတွေ့ပါ။");
+    } finally {
+      try { await reader.clear(); } catch {}
+      event.target.value = "";
+    }
+  }
+
+  function showScanResult(text) {
+    document.getElementById("scan-result").textContent = text;
+    const count = Number(localStorage.getItem(SCAN_KEY) || 0) + 1;
+    localStorage.setItem(SCAN_KEY, String(count));
+    renderStats();
+
+    const box = document.getElementById("scan-action-buttons");
+    box.innerHTML = "";
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "bg-slate-800 text-white py-3 rounded-xl font-bold text-sm";
+    copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> ကူးယူမည်';
+    copyBtn.onclick = async () => {
+      await copyText(text);
+      showToast("ကူးယူပြီးပါပြီ။");
+    };
+    box.appendChild(copyBtn);
+
+    if (text.trim().toUpperCase().startsWith("BEGIN:VCARD")) {
+      const saveBtn = document.createElement("button");
+      saveBtn.className = "bg-emerald-600 text-white py-3 rounded-xl font-bold text-sm";
+      saveBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Contact ထည့်မည်';
+      saveBtn.onclick = () => importScannedVCard(text);
+      box.appendChild(saveBtn);
+    }
+
+    showToast("QR Code ဖတ်ပြီးပါပြီ။");
+  }
+
+  function importScannedVCard(text) {
+    const parsed = parseVCard(text);
+    if (!parsed.name || !parsed.phone) {
+      showToast("Contact အချက်အလက် မပြည့်စုံပါ။");
+      return;
+    }
+
+    contacts.unshift({
+      id: uid(),
+      ...parsed,
+      favorite: false,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    });
+
+    saveData();
+    renderAll();
+    showToast("Contact ထည့်ပြီးပါပြီ။");
+  }
+
+  function parseVCard(text) {
+    const lines = text.replace(/\r\n/g, "\n").split("\n");
+    const get = prefix => lines.find(line => line.toUpperCase().startsWith(prefix))?.split(":").slice(1).join(":") || "";
+
+    const telLines = lines.filter(line => line.toUpperCase().startsWith("TEL"));
+    const phone = telLines[0]?.split(":").slice(1).join(":") || "";
+    const viber = telLines[1]?.split(":").slice(1).join(":") || "";
+
+    return {
+      name: unescapeVCard(get("FN:")),
+      phone,
+      viber,
+      email: get("EMAIL"),
+      organization: unescapeVCard(get("ORG:")),
+      kbz: "",
+      address: unescapeVCard(get("ADR")),
+      note: unescapeVCard(get("NOTE:"))
+    };
+  }
+
+  function unescapeVCard(value) {
+    return String(value || "")
+      .replace(/\\n/g, "\n")
+      .replace(/\\,/g, ",")
+      .replace(/\\;/g, ";")
+      .replace(/\\\\/g, "\\");
+  }
+
+  function csvEscape(value) {
+    const text = String(value ?? "");
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  function exportCSV() {
+    const header = ["name","phone","viber","kbz","address","email","organization","note"];
+    const rows = contacts.map(c => header.map(key => csvEscape(c[key])).join(","));
+    const csv = "\uFEFF" + [header.join(","), ...rows].join("\r\n");
+    downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), "contacts.csv");
+    showToast("CSV ဖိုင် ထုတ်ပြီးပါပြီ။");
+  }
+
+  function downloadCSVTemplate() {
+    const csv = "\uFEFFname,phone,viber,kbz,address,email,organization,note\r\n";
+    downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), "contacts-template.csv");
+  }
+
+  async function importCSV(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const text = await file.text();
+    const rows = parseCSV(text);
+    if (rows.length < 2) {
+      showToast("CSV ဖိုင်အချက်အလက် မရှိပါ။");
+      return;
+    }
+
+    const headers = rows[0].map(h => h.trim().toLowerCase());
+    let added = 0;
+
+    for (const row of rows.slice(1)) {
+      if (!row.some(Boolean)) continue;
+
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = row[i] || "");
+
+      if (!obj.name || !obj.phone) continue;
+
+      contacts.push({
+        id: uid(),
+        name: obj.name,
+        phone: obj.phone,
+        viber: obj.viber || "",
+        kbz: obj.kbz || "",
+        address: obj.address || "",
+        email: obj.email || "",
+        organization: obj.organization || "",
+        note: obj.note || "",
+        favorite: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      });
+      added++;
+    }
+
+    saveData();
+    renderAll();
+    event.target.value = "";
+    showToast(`${added} Contact ထည့်ပြီးပါပြီ။`);
+  }
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], cell = "", quoted = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      const next = text[i + 1];
+
+      if (quoted) {
+        if (ch === '"' && next === '"') {
+          cell += '"';
+          i++;
+        } else if (ch === '"') {
+          quoted = false;
+        } else {
+          cell += ch;
+        }
+      } else {
+        if (ch === '"') {
+          quoted = true;
+        } else if (ch === ",") {
+          row.push(cell);
+          cell = "";
+        } else if (ch === "\n") {
+          row.push(cell.replace(/\r$/, ""));
+          rows.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += ch;
+        }
+      }
+    }
+
+    row.push(cell);
+    rows.push(row);
+    return rows;
+  }
+
+  function downloadBackup() {
+    const backup = {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      contacts,
+      settings: getSettings(),
+      scanCount: Number(localStorage.getItem(SCAN_KEY) || 0)
+    };
+
+    downloadBlob(
+      new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" }),
+      `contact-qr-backup-${new Date().toISOString().slice(0,10)}.json`
+    );
+
+    showToast("Backup သိမ်းပြီးပါပြီ။");
+  }
+
+  async function restoreBackup(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const backup = JSON.parse(await file.text());
+      if (!Array.isArray(backup.contacts)) throw new Error("Invalid backup");
+
+      contacts = backup.contacts;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
+      if (backup.settings) localStorage.setItem(SETTINGS_KEY, JSON.stringify(backup.settings));
+      if (backup.scanCount != null) localStorage.setItem(SCAN_KEY, String(backup.scanCount));
+
+      applySavedTheme();
+      renderAll();
+      showToast("Backup ပြန်သွင်းပြီးပါပြီ။");
+    } catch {
+      showToast("Backup ဖိုင်မမှန်ပါ။");
+    } finally {
+      event.target.value = "";
+    }
+  }
+
+  function clearAllData() {
+    if (!confirm("Contact နှင့် Setting အားလုံးကို ဖျက်မည်လား?")) return;
+
+    contacts = [];
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SETTINGS_KEY);
+    localStorage.removeItem(SCAN_KEY);
+    document.documentElement.classList.remove("dark");
+    saveData();
+    renderAll();
+    showToast("Data အားလုံးဖျက်ပြီးပါပြီ။");
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand("copy");
+    area.remove();
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.remove("hidden");
+
+    clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => toast.classList.add("hidden"), 2600);
+  }
 </script>
 </body>
 </html>
