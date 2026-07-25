@@ -1,0 +1,374 @@
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            const safeFileName = currentContact.name
+                .replace(/[<>:"/\\|?*]+/g, '')
+                .replace(/\s+/g, '_')
+                .trim();
+
+            link.href = url;
+            link.download = `${safeFileName || 'contact'}.vcf`;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('Contact .VCF ဖိုင် ထုတ်ပြီးပါပြီ။');
+        }
+
+        // Share Contact
+        async function shareContact() {
+            const vcardText = generateVCardString(currentContact);
+            const blob = new Blob(
+                [vcardText],
+                { type: 'text/vcard;charset=utf-8' }
+            );
+
+            const safeFileName = currentContact.name
+                .replace(/[<>:"/\\|?*]+/g, '')
+                .replace(/\s+/g, '_')
+                .trim();
+
+            const file = new File(
+                [blob],
+                `${safeFileName || 'contact'}.vcf`,
+                { type: 'text/vcard' }
+            );
+
+            try {
+                if (
+                    navigator.share &&
+                    navigator.canShare &&
+                    navigator.canShare({ files: [file] })
+                ) {
+                    await navigator.share({
+                        title: currentContact.name,
+                        text: `${currentContact.name} Contact`,
+                        files: [file]
+                    });
+
+                    showToast('Contact ကို Share ပြီးပါပြီ။');
+                    return;
+                }
+
+                if (navigator.share) {
+                    await navigator.share({
+                        title: currentContact.name,
+                        text: [
+                            `Name: ${currentContact.name}`,
+                            `Phone: ${currentContact.phone}`,
+                            `Viber: ${currentContact.viber}`,
+                            `KBZ Account: ${currentContact.kbzAccount}`,
+                            `Address: ${currentContact.address}`
+                        ].join('\n')
+                    });
+
+                    showToast('Contact အချက်အလက်ကို Share ပြီးပါပြီ။');
+                    return;
+                }
+
+                await navigator.clipboard.writeText(vcardText);
+                showToast('Share မရသဖြင့် Contact Data ကို Copy ကူးထားပါသည်။');
+
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Share error:', error);
+                    showToast('Share မလုပ်နိုင်ပါ။');
+                }
+            }
+        }
+
+        // Apply Custom Data and Regenerate QR
+        function applyCustomData() {
+            const name = document
+                .getElementById('input-name')
+                .value
+                .trim();
+
+            const phone = document
+                .getElementById('input-phone')
+                .value
+                .trim();
+
+            const viber = document
+                .getElementById('input-viber')
+                .value
+                .trim();
+
+            const kbzAccount = document
+                .getElementById('input-kbz')
+                .value
+                .trim();
+
+            const address = document
+                .getElementById('input-address')
+                .value
+                .trim();
+
+            if (!name) {
+                showToast('အမည် ထည့်ပေးပါ။');
+                document.getElementById('input-name').focus();
+                return;
+            }
+
+            if (!phone) {
+                showToast('ဖုန်းနံပါတ် ထည့်ပေးပါ။');
+                document.getElementById('input-phone').focus();
+                return;
+            }
+
+            currentContact = {
+                name,
+                phone,
+                viber,
+                kbzAccount,
+                address
+            };
+
+            renderVCardQR();
+            switchTab('vcard');
+            showToast('Contact QR Code အသစ် ပြုလုပ်ပြီးပါပြီ။');
+        }
+
+        // Copy Individual Information
+        async function copyText(elementId) {
+            const element = document.getElementById(elementId);
+
+            if (!element) {
+                showToast('Copy လုပ်မည့် အချက်အလက် မတွေ့ပါ။');
+                return;
+            }
+
+            const text = element.innerText.trim();
+
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(`${text} ကို Copy ကူးပြီးပါပြီ။`);
+            } catch (error) {
+                const temporaryInput = document.createElement('textarea');
+                temporaryInput.value = text;
+                temporaryInput.style.position = 'fixed';
+                temporaryInput.style.opacity = '0';
+
+                document.body.appendChild(temporaryInput);
+                temporaryInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(temporaryInput);
+
+                showToast(`${text} ကို Copy ကူးပြီးပါပြီ။`);
+            }
+        }
+
+        // Toast Message
+        let toastTimer = null;
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-msg');
+
+            toastMessage.innerText = message;
+            toast.classList.remove('hidden');
+            toast.classList.add('animate-pop');
+
+            clearTimeout(toastTimer);
+
+            toastTimer = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('animate-pop');
+            }, 2500);
+        }
+
+        // Start Camera QR Scanner
+        async function startScanner() {
+            const readerElement = document.getElementById('qr-reader');
+
+            if (!readerElement) return;
+
+            try {
+                if (html5QrcodeScanner) {
+                    try {
+                        await html5QrcodeScanner.clear();
+                    } catch (clearError) {
+                        console.warn('Scanner clear warning:', clearError);
+                    }
+
+                    html5QrcodeScanner = null;
+                }
+
+                readerElement.innerHTML = '';
+
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    'qr-reader',
+                    {
+                        fps: 10,
+                        qrbox: {
+                            width: 220,
+                            height: 220
+                        },
+                        aspectRatio: 1,
+                        rememberLastUsedCamera: true,
+                        showTorchButtonIfSupported: true,
+                        showZoomSliderIfSupported: true
+                    },
+                    false
+                );
+
+                html5QrcodeScanner.render(
+                    onScanSuccess,
+                    onScanFailure
+                );
+
+            } catch (error) {
+                console.error('Scanner start error:', error);
+                showToast('ကင်မရာ Scanner ဖွင့်မရပါ။');
+            }
+        }
+
+        // QR Scan Success
+        function onScanSuccess(decodedText) {
+            displayScanResult(decodedText);
+
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner
+                    .clear()
+                    .catch(error => {
+                        console.warn('Scanner stop warning:', error);
+                    });
+            }
+
+            showToast('QR Code ဖတ်ပြီးပါပြီ။');
+        }
+
+        // QR Scan Failure
+        function onScanFailure(error) {
+            // QR ကို မတွေ့သေးသည့်အချိန်တိုင်း error ထုတ်နေမည်ဖြစ်သောကြောင့်
+            // Console ထဲ မပြရန် ဒီနေရာကို အလွတ်ထားသည်။
+        }
+
+        // Scan QR from Uploaded Image
+        async function scanFromFile(event) {
+            const file = event.target.files?.[0];
+
+            if (!file) return;
+
+            const tempScannerId = 'temporary-file-scanner';
+            let tempElement = document.getElementById(tempScannerId);
+
+            if (!tempElement) {
+                tempElement = document.createElement('div');
+                tempElement.id = tempScannerId;
+                tempElement.style.display = 'none';
+                document.body.appendChild(tempElement);
+            }
+
+            const fileScanner = new Html5Qrcode(tempScannerId);
+
+            try {
+                const decodedText = await fileScanner.scanFile(
+                    file,
+                    true
+                );
+
+                displayScanResult(decodedText);
+                showToast('ပုံထဲမှ QR Code ဖတ်ပြီးပါပြီ။');
+
+            } catch (error) {
+                console.error('Image scan error:', error);
+                showToast('ပုံထဲတွင် QR Code မတွေ့ပါ။');
+
+            } finally {
+                try {
+                    await fileScanner.clear();
+                } catch (clearError) {
+                    console.warn(clearError);
+                }
+
+                event.target.value = '';
+            }
+        }
+
+        // Display Scan Result
+        function displayScanResult(decodedText) {
+            const resultCard =
+                document.getElementById('scan-result-card');
+
+            const resultContent =
+                document.getElementById('scan-result-content');
+
+            resultContent.innerText = decodedText;
+            resultCard.classList.remove('hidden');
+
+            const oldButtons =
+                resultCard.querySelector('#scan-action-buttons');
+
+            if (oldButtons) {
+                oldButtons.remove();
+            }
+
+            const actionButtons = document.createElement('div');
+            actionButtons.id = 'scan-action-buttons';
+            actionButtons.className =
+                'grid grid-cols-1 sm:grid-cols-2 gap-2.5';
+
+            const copyButton = document.createElement('button');
+            copyButton.className =
+                'bg-slate-800 hover:bg-slate-700 text-white py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2';
+            copyButton.innerHTML =
+                '<i class="fa-solid fa-copy"></i><span>အချက်အလက် Copy ကူးမည်</span>';
+
+            copyButton.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(decodedText);
+                    showToast('Scan Result ကို Copy ကူးပြီးပါပြီ။');
+                } catch (error) {
+                    showToast('Copy မလုပ်နိုင်ပါ။');
+                }
+            };
+
+            actionButtons.appendChild(copyButton);
+
+            if (
+                decodedText.trim().toUpperCase().startsWith('BEGIN:VCARD')
+            ) {
+                const saveButton = document.createElement('button');
+
+                saveButton.className =
+                    'bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2';
+
+                saveButton.innerHTML =
+                    '<i class="fa-solid fa-user-plus"></i><span>Contact ဖိုင် Save မည်</span>';
+
+                saveButton.onclick = () => {
+                    downloadScannedVCard(decodedText);
+                };
+
+                actionButtons.appendChild(saveButton);
+            }
+
+            resultCard.appendChild(actionButtons);
+        }
+
+        // Download Scanned vCard
+        function downloadScannedVCard(vcardText) {
+            const blob = new Blob(
+                [vcardText],
+                { type: 'text/vcard;charset=utf-8' }
+            );
+
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            link.href = url;
+            link.download = 'scanned-contact.vcf';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('Scanned Contact ဖိုင် ထုတ်ပြီးပါပြီ။');
+        }
+    </script>
+</body>
+</html>
