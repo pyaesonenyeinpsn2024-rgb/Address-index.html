@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f766e" />
-  <meta name="description" content="Professional digital business card, vCard QR, contact manager and QR scanner." />
-  <title>Perfect Digital Contact Hub</title>
+  <meta name="theme-color" content="#065f46" />
+  <meta name="description" content="Professional digital business card and contact management platform." />
+  <title>Perfect Digital Business Card</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -17,805 +17,706 @@
     :root { color-scheme: light; }
     html.dark { color-scheme: dark; }
     body { font-family: "Padauk", "Inter", sans-serif; }
-    .glass { backdrop-filter: blur(18px); background: rgba(255,255,255,.76); }
-    .dark .glass { background: rgba(15,23,42,.78); }
-    .hide-scrollbar::-webkit-scrollbar { display:none; }
-    .hide-scrollbar { scrollbar-width:none; }
-    .fade-in { animation: fadeIn .22s ease-out; }
+    .fade-in { animation: fadeIn .2s ease-out; }
     @keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to {opacity:1; transform:none;} }
+    .hide-scroll::-webkit-scrollbar { display:none; }
+    .hide-scroll { scrollbar-width:none; }
     #qr-reader { border:0 !important; color:inherit; }
     #qr-reader video { border-radius:18px; }
     #qr-reader button, #qr-reader select {
-      color:#0f172a !important;
-      background:#fff !important;
-      border-radius:10px !important;
-      padding:8px 10px !important;
-      font-size:12px !important;
-      font-weight:700 !important;
+      color:#0f172a !important; background:#fff !important;
+      border-radius:10px !important; padding:8px 10px !important;
+      font-size:12px !important; font-weight:700 !important;
       border:1px solid #cbd5e1 !important;
     }
   </style>
 </head>
 
 <body class="min-h-screen bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-  <header class="sticky top-0 z-40 border-b border-white/10 bg-gradient-to-r from-teal-900 via-emerald-800 to-cyan-900 text-white shadow-xl">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="h-11 w-11 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-          <i class="fa-solid fa-id-card-clip text-xl text-emerald-300"></i>
-        </div>
-        <div class="min-w-0">
-          <h1 class="font-bold text-base sm:text-xl truncate">Perfect Digital Contact Hub</h1>
-          <p class="text-xs text-emerald-100 truncate">Digital Business Card • vCard QR • Contact Manager</p>
-        </div>
-      </div>
 
-      <div class="flex gap-2">
-        <button onclick="toggleTheme()" class="h-10 w-10 rounded-xl bg-white/10 border border-white/20">
-          <i id="theme-icon" class="fa-solid fa-moon"></i>
-        </button>
-        <button onclick="openEditor()" class="px-3 h-10 rounded-xl bg-amber-400 text-slate-900 font-bold text-xs sm:text-sm">
-          <i class="fa-solid fa-pen"></i>
-          <span class="hidden sm:inline">Profile ပြင်မည်</span>
-        </button>
+<header class="sticky top-0 z-40 bg-gradient-to-r from-emerald-900 via-teal-800 to-cyan-900 text-white shadow-xl">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="h-11 w-11 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-id-card text-xl text-emerald-300"></i>
+      </div>
+      <div class="min-w-0">
+        <h1 class="font-bold text-base sm:text-xl truncate">Perfect Digital Business Card</h1>
+        <p id="subtitle-text" class="text-xs text-emerald-100 truncate">Professional Contact • QR • Catalog • Booking</p>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
-    <section class="grid lg:grid-cols-[380px_1fr] gap-5">
-      <aside class="space-y-4">
-        <article class="overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg">
-          <div class="h-32 bg-gradient-to-br from-emerald-700 via-teal-600 to-cyan-700 relative">
-            <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle at 20% 20%,white 0,transparent 35%),radial-gradient(circle at 80% 60%,white 0,transparent 28%)"></div>
-          </div>
+    <div class="flex items-center gap-2">
+      <button onclick="toggleLanguage()" class="h-10 px-3 rounded-xl bg-white/10 border border-white/20 text-xs font-bold">
+        <span id="lang-label">EN</span>
+      </button>
+      <button onclick="toggleTheme()" class="h-10 w-10 rounded-xl bg-white/10 border border-white/20">
+        <i id="theme-icon" class="fa-solid fa-moon"></i>
+      </button>
+      <button onclick="openAdmin()" class="h-10 px-3 rounded-xl bg-amber-400 text-slate-900 text-xs font-bold">
+        <i class="fa-solid fa-lock"></i> Admin
+      </button>
+    </div>
+  </div>
+</header>
 
-          <div class="px-5 pb-5 -mt-14 relative">
-            <div class="flex items-end justify-between gap-3">
-              <div class="h-28 w-28 rounded-3xl border-4 border-white dark:border-slate-900 bg-slate-200 overflow-hidden shadow-xl">
-                <img id="profile-photo" class="w-full h-full object-cover hidden" alt="Profile" />
-                <div id="profile-placeholder" class="w-full h-full flex items-center justify-center text-4xl text-slate-400">
-                  <i class="fa-solid fa-user"></i>
-                </div>
-              </div>
-              <button onclick="toggleFavorite()" class="h-11 w-11 rounded-2xl bg-white dark:bg-slate-800 shadow border border-slate-200 dark:border-slate-700">
-                <i id="favorite-icon" class="fa-regular fa-star"></i>
-              </button>
-            </div>
+<main class="max-w-7xl mx-auto px-4 py-5 space-y-5">
 
-            <div class="mt-4">
-              <h2 id="card-name" class="text-2xl font-bold"></h2>
-              <p id="card-title" class="text-sm text-emerald-700 dark:text-emerald-300 font-bold"></p>
-              <p id="card-company" class="text-sm text-slate-500 dark:text-slate-400"></p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 mt-4">
-              <a id="call-link" class="bg-emerald-600 text-white rounded-xl py-3 text-center font-bold text-sm">
-                <i class="fa-solid fa-phone"></i> ဖုန်းခေါ်မည်
-              </a>
-              <button onclick="downloadVCard()" class="bg-slate-900 text-white dark:bg-slate-700 rounded-xl py-3 font-bold text-sm">
-                <i class="fa-solid fa-address-card"></i> Contact Save
-              </button>
-            </div>
-
-            <div id="social-links" class="grid grid-cols-4 gap-2 mt-3"></div>
-          </div>
-        </article>
-
-        <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm p-5">
-          <h3 class="font-bold">အမြန်လုပ်ဆောင်ချက်များ</h3>
-          <div class="grid grid-cols-2 gap-2 mt-3">
-            <button onclick="shareProfile()" class="rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 py-3 text-sm font-bold">
-              <i class="fa-solid fa-share-nodes"></i> Share
-            </button>
-            <button onclick="downloadQR()" class="rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 py-3 text-sm font-bold">
-              <i class="fa-solid fa-image"></i> QR PNG
-            </button>
-            <button onclick="copyProfileText()" class="rounded-xl bg-slate-100 dark:bg-slate-800 py-3 text-sm font-bold">
-              <i class="fa-solid fa-copy"></i> Copy
-            </button>
-            <button onclick="installPWA()" class="rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 py-3 text-sm font-bold">
-              <i class="fa-solid fa-mobile-screen"></i> Install
-            </button>
-          </div>
-        </article>
-      </aside>
-
-      <section class="space-y-4">
-        <div class="glass rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-2 overflow-x-auto hide-scrollbar">
-          <div class="flex gap-2 min-w-max">
-            <button id="tab-overview" onclick="switchTab('overview')" class="tab-btn bg-emerald-600 text-white px-4 py-3 rounded-2xl font-bold text-sm">
-              <i class="fa-solid fa-house"></i> Overview
-            </button>
-            <button id="tab-qr" onclick="switchTab('qr')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
-              <i class="fa-solid fa-qrcode"></i> QR & vCard
-            </button>
-            <button id="tab-payments" onclick="switchTab('payments')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
-              <i class="fa-solid fa-wallet"></i> Payments
-            </button>
-            <button id="tab-scanner" onclick="switchTab('scanner')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
-              <i class="fa-solid fa-camera"></i> Scanner
-            </button>
-            <button id="tab-backup" onclick="switchTab('backup')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
-              <i class="fa-solid fa-database"></i> Backup
-            </button>
-          </div>
+  <section class="grid lg:grid-cols-[390px_1fr] gap-5">
+    <aside class="space-y-4">
+      <article class="overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg">
+        <div id="cover-area" class="h-36 bg-gradient-to-br from-emerald-700 via-teal-600 to-cyan-700 relative">
+          <img id="cover-image" class="hidden w-full h-full object-cover" alt="Cover" />
         </div>
 
-        <section id="sec-overview" class="app-section fade-in space-y-4">
-          <div class="grid md:grid-cols-3 gap-4">
-            <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <p class="text-xs text-slate-500">Profile Views</p>
-              <p id="views-count" class="text-3xl font-bold mt-1">1</p>
+        <div class="px-5 pb-5 -mt-16 relative">
+          <div class="flex items-end justify-between gap-3">
+            <div class="h-28 w-28 rounded-3xl border-4 border-white dark:border-slate-900 bg-slate-200 overflow-hidden shadow-xl">
+              <img id="profile-photo" class="hidden w-full h-full object-cover" alt="Profile" />
+              <div id="profile-placeholder" class="w-full h-full flex items-center justify-center text-4xl text-slate-400">
+                <i class="fa-solid fa-user"></i>
+              </div>
             </div>
-            <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <p class="text-xs text-slate-500">Contact Saves</p>
-              <p id="save-count" class="text-3xl font-bold mt-1">0</p>
-            </div>
-            <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <p class="text-xs text-slate-500">QR Scans</p>
-              <p id="scan-count" class="text-3xl font-bold mt-1">0</p>
+            <div class="h-16 w-16 rounded-2xl border-4 border-white dark:border-slate-900 bg-white overflow-hidden shadow">
+              <img id="company-logo" class="hidden w-full h-full object-contain p-1" alt="Logo" />
+              <div id="logo-placeholder" class="w-full h-full flex items-center justify-center text-slate-400">
+                <i class="fa-solid fa-building"></i>
+              </div>
             </div>
           </div>
 
-          <div class="grid md:grid-cols-2 gap-4">
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <h3 class="font-bold">Contact အချက်အလက်</h3>
-              <div id="contact-details" class="mt-4 space-y-3"></div>
-            </article>
-
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <h3 class="font-bold">About</h3>
-              <p id="about-text" class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-7"></p>
-            </article>
+          <div class="mt-4">
+            <h2 id="profile-name" class="text-2xl font-bold"></h2>
+            <p id="profile-title" class="text-sm font-bold text-emerald-700 dark:text-emerald-300"></p>
+            <p id="profile-company" class="text-sm text-slate-500 dark:text-slate-400"></p>
           </div>
-        </section>
 
-        <section id="sec-qr" class="app-section hidden fade-in">
-          <div class="grid md:grid-cols-[320px_1fr] gap-4">
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 text-center">
-              <div class="inline-block bg-white p-4 rounded-3xl shadow border">
-                <div id="profile-qr"></div>
-              </div>
-              <h3 class="font-bold mt-4">Contact vCard QR</h3>
-              <p class="text-xs text-slate-500 mt-1">ဖုန်း Camera ဖြင့် Scan ဖတ်ပါ</p>
-            </article>
-
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <h3 class="font-bold">vCard Actions</h3>
-              <div class="grid sm:grid-cols-2 gap-3 mt-4">
-                <button onclick="downloadVCard()" class="bg-emerald-600 text-white py-3 rounded-xl font-bold">
-                  <i class="fa-solid fa-download"></i> .VCF Download
-                </button>
-                <button onclick="shareProfile()" class="bg-slate-900 text-white py-3 rounded-xl font-bold">
-                  <i class="fa-solid fa-share-nodes"></i> Share Contact
-                </button>
-                <button onclick="downloadQR()" class="bg-amber-400 text-slate-900 py-3 rounded-xl font-bold">
-                  <i class="fa-solid fa-image"></i> QR PNG
-                </button>
-                <button onclick="copyVCard()" class="bg-blue-600 text-white py-3 rounded-xl font-bold">
-                  <i class="fa-solid fa-copy"></i> Copy vCard
-                </button>
-              </div>
-            </article>
+          <div class="grid grid-cols-2 gap-2 mt-4">
+            <a id="call-button" class="rounded-xl bg-emerald-600 text-white py-3 text-center font-bold text-sm">
+              <i class="fa-solid fa-phone"></i> <span data-i18n="call">ဖုန်းခေါ်မည်</span>
+            </a>
+            <button onclick="downloadVCard()" class="rounded-xl bg-slate-900 dark:bg-slate-700 text-white py-3 font-bold text-sm">
+              <i class="fa-solid fa-address-card"></i> <span data-i18n="saveContact">Contact Save</span>
+            </button>
           </div>
-        </section>
 
-        <section id="sec-payments" class="app-section hidden fade-in">
-          <div id="payment-grid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-        </section>
+          <div id="social-buttons" class="grid grid-cols-4 gap-2 mt-3"></div>
+        </div>
+      </article>
 
-        <section id="sec-scanner" class="app-section hidden fade-in">
-          <div class="grid lg:grid-cols-2 gap-4">
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <h3 class="font-bold">QR Scanner</h3>
-              <div class="mt-4 min-h-[280px] rounded-2xl bg-slate-950 overflow-hidden flex items-center">
-                <div id="qr-reader" class="w-full"></div>
-              </div>
-              <div class="grid sm:grid-cols-2 gap-2 mt-4">
-                <button onclick="startScanner()" class="bg-emerald-600 text-white rounded-xl py-3 font-bold">
-                  <i class="fa-solid fa-camera"></i> Camera
-                </button>
-                <label class="cursor-pointer bg-slate-800 text-white rounded-xl py-3 font-bold text-center">
-                  <i class="fa-solid fa-image"></i> Image
-                  <input type="file" accept="image/*" class="hidden" onchange="scanImage(event)" />
-                </label>
-              </div>
-            </article>
-
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <h3 class="font-bold">Scan Result</h3>
-              <pre id="scan-result" class="mt-4 min-h-[230px] bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 text-xs whitespace-pre-wrap break-all">ရလဒ်မရှိသေးပါ။</pre>
-              <div id="scan-actions" class="grid sm:grid-cols-2 gap-2 mt-3"></div>
-            </article>
-          </div>
-        </section>
-
-        <section id="sec-backup" class="app-section hidden fade-in">
-          <div class="grid md:grid-cols-3 gap-4">
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <h3 class="font-bold">Backup</h3>
-              <p class="text-sm text-slate-500 mt-2">Profile နှင့် Setting များကို JSON ဖိုင်အဖြစ် သိမ်းပါ။</p>
-              <button onclick="downloadBackup()" class="w-full mt-4 bg-emerald-600 text-white py-3 rounded-xl font-bold">Download Backup</button>
-            </article>
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-              <h3 class="font-bold">Restore</h3>
-              <p class="text-sm text-slate-500 mt-2">ယခင် Backup ကို ပြန်ထည့်ပါ။</p>
-              <label class="block mt-4 bg-slate-800 text-white py-3 rounded-xl font-bold text-center cursor-pointer">
-                Restore File
-                <input type="file" accept=".json,application/json" class="hidden" onchange="restoreBackup(event)" />
-              </label>
-            </article>
-            <article class="rounded-3xl bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900 p-5">
-              <h3 class="font-bold text-red-600">Reset</h3>
-              <p class="text-sm text-slate-500 mt-2">App data အားလုံးကို မူလအတိုင်းပြန်ထားမည်။</p>
-              <button onclick="resetApp()" class="w-full mt-4 bg-red-600 text-white py-3 rounded-xl font-bold">Reset App</button>
-            </article>
-          </div>
-        </section>
-      </section>
-    </section>
-  </main>
-
-  <div id="editor-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 p-4 overflow-y-auto">
-    <div class="min-h-full flex items-center justify-center">
-      <div class="w-full max-w-3xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-5 fade-in">
-        <div class="flex justify-between items-center">
-          <h2 class="font-bold text-lg">Profile ပြင်ဆင်မည်</h2>
-          <button onclick="closeEditor()" class="h-10 w-10 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
-            <i class="fa-solid fa-xmark"></i>
+      <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+        <h3 class="font-bold" data-i18n="quickActions">အမြန်လုပ်ဆောင်ချက်များ</h3>
+        <div class="grid grid-cols-2 gap-2 mt-3">
+          <button onclick="shareProfile()" class="rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 py-3 font-bold text-sm">
+            <i class="fa-solid fa-share-nodes"></i> Share
+          </button>
+          <button onclick="downloadQR()" class="rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 py-3 font-bold text-sm">
+            <i class="fa-solid fa-image"></i> QR PNG
+          </button>
+          <button onclick="copyProfile()" class="rounded-xl bg-slate-100 dark:bg-slate-800 py-3 font-bold text-sm">
+            <i class="fa-solid fa-copy"></i> Copy
+          </button>
+          <button onclick="installApp()" class="rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 py-3 font-bold text-sm">
+            <i class="fa-solid fa-mobile-screen"></i> Install
           </button>
         </div>
+      </article>
+    </aside>
 
-        <form onsubmit="saveProfile(event)" class="grid sm:grid-cols-2 gap-3 mt-4">
-          <label class="sm:col-span-2 text-xs font-bold">
-            Profile Photo
-            <input id="field-photo" type="file" accept="image/*" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl p-2 bg-white dark:bg-slate-950" onchange="previewPhoto(event)" />
-          </label>
+    <section class="space-y-4">
+      <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2 overflow-x-auto hide-scroll shadow-sm">
+        <div class="flex gap-2 min-w-max">
+          <button id="tab-home" onclick="switchTab('home')" class="tab-btn bg-emerald-600 text-white px-4 py-3 rounded-2xl font-bold text-sm">
+            <i class="fa-solid fa-house"></i> Home
+          </button>
+          <button id="tab-qr" onclick="switchTab('qr')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
+            <i class="fa-solid fa-qrcode"></i> QR
+          </button>
+          <button id="tab-payments" onclick="switchTab('payments')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
+            <i class="fa-solid fa-wallet"></i> Payments
+          </button>
+          <button id="tab-catalog" onclick="switchTab('catalog')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
+            <i class="fa-solid fa-boxes-stacked"></i> Catalog
+          </button>
+          <button id="tab-booking" onclick="switchTab('booking')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
+            <i class="fa-solid fa-calendar-check"></i> Booking
+          </button>
+          <button id="tab-inquiry" onclick="switchTab('inquiry')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
+            <i class="fa-solid fa-message"></i> Inquiry
+          </button>
+          <button id="tab-scanner" onclick="switchTab('scanner')" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm">
+            <i class="fa-solid fa-camera"></i> Scanner
+          </button>
+        </div>
+      </div>
 
-          <label class="text-xs font-bold">အမည်
-            <input id="field-name" required class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">ရာထူး
-            <input id="field-title" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">Company
-            <input id="field-company" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">ဖုန်း
-            <input id="field-phone" required class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">Viber
-            <input id="field-viber" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">Email
-            <input id="field-email" type="email" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">Website
-            <input id="field-website" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">Facebook URL
-            <input id="field-facebook" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">Telegram URL
-            <input id="field-telegram" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">KBZ Account
-            <input id="field-kbz" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">WavePay
-            <input id="field-wave" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="text-xs font-bold">AYA Pay
-            <input id="field-aya" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950" />
-          </label>
-          <label class="sm:col-span-2 text-xs font-bold">လိပ်စာ
-            <textarea id="field-address" rows="2" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950"></textarea>
-          </label>
-          <label class="sm:col-span-2 text-xs font-bold">About
-            <textarea id="field-about" rows="3" class="mt-1 w-full border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950"></textarea>
-          </label>
-
-          <div class="sm:col-span-2 flex gap-2 pt-2">
-            <button type="button" onclick="closeEditor()" class="flex-1 bg-slate-200 dark:bg-slate-800 rounded-xl py-3 font-bold">ပယ်ဖျက်မည်</button>
-            <button type="submit" class="flex-1 bg-emerald-600 text-white rounded-xl py-3 font-bold">သိမ်းမည်</button>
+      <section id="sec-home" class="app-section fade-in space-y-4">
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <p class="text-xs text-slate-500" data-i18n="views">Profile Views</p>
+            <p id="metric-views" class="text-3xl font-bold mt-1">0</p>
           </div>
+          <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <p class="text-xs text-slate-500" data-i18n="saves">Contact Saves</p>
+            <p id="metric-saves" class="text-3xl font-bold mt-1">0</p>
+          </div>
+          <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <p class="text-xs text-slate-500" data-i18n="scans">QR Scans</p>
+            <p id="metric-scans" class="text-3xl font-bold mt-1">0</p>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <h3 class="font-bold" data-i18n="contactInfo">Contact အချက်အလက်</h3>
+            <div id="contact-info" class="mt-4 space-y-3"></div>
+          </article>
+
+          <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <h3 class="font-bold">About</h3>
+            <p id="about-text" class="mt-4 text-sm leading-7 text-slate-600 dark:text-slate-300"></p>
+            <a id="map-link" target="_blank" rel="noopener" class="hidden mt-4 w-full bg-blue-600 text-white py-3 rounded-xl text-center font-bold">
+              <i class="fa-solid fa-map-location-dot"></i> Google Maps
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section id="sec-qr" class="app-section hidden fade-in">
+        <div class="grid md:grid-cols-[320px_1fr] gap-4">
+          <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 text-center">
+            <div class="inline-block bg-white p-4 rounded-3xl border shadow">
+              <div id="main-qr"></div>
+            </div>
+            <h3 class="font-bold mt-4">vCard QR</h3>
+            <p class="text-xs text-slate-500 mt-1">Scan → Add to Contacts</p>
+          </article>
+          <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <h3 class="font-bold">QR & vCard Actions</h3>
+            <div class="grid sm:grid-cols-2 gap-3 mt-4">
+              <button onclick="downloadVCard()" class="bg-emerald-600 text-white py-3 rounded-xl font-bold">VCF Download</button>
+              <button onclick="shareProfile()" class="bg-slate-900 text-white py-3 rounded-xl font-bold">Share Contact</button>
+              <button onclick="downloadQR()" class="bg-amber-400 text-slate-900 py-3 rounded-xl font-bold">QR PNG</button>
+              <button onclick="copyVCard()" class="bg-blue-600 text-white py-3 rounded-xl font-bold">Copy vCard</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="sec-payments" class="app-section hidden fade-in">
+        <div id="payments-grid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      </section>
+
+      <section id="sec-catalog" class="app-section hidden fade-in">
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="font-bold text-lg" data-i18n="catalog">Product Catalog</h2>
+            <p class="text-sm text-slate-500" data-i18n="catalogDesc">ကုန်ပစ္စည်းနှင့် ဝန်ဆောင်မှုများ</p>
+          </div>
+        </div>
+        <div id="catalog-grid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      </section>
+
+      <section id="sec-booking" class="app-section hidden fade-in">
+        <article class="max-w-2xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+          <h2 class="font-bold text-lg" data-i18n="booking">Appointment Booking</h2>
+          <form onsubmit="submitBooking(event)" class="grid sm:grid-cols-2 gap-3 mt-4">
+            <input id="booking-name" required placeholder="Name" class="border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="booking-phone" required placeholder="Phone" class="border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="booking-date" required type="date" class="border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="booking-time" required type="time" class="border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <textarea id="booking-note" rows="3" placeholder="Note" class="sm:col-span-2 border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700"></textarea>
+            <button class="sm:col-span-2 bg-emerald-600 text-white py-3 rounded-xl font-bold">
+              <i class="fa-solid fa-calendar-check"></i> Submit Booking
+            </button>
+          </form>
+        </article>
+      </section>
+
+      <section id="sec-inquiry" class="app-section hidden fade-in">
+        <article class="max-w-2xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+          <h2 class="font-bold text-lg" data-i18n="inquiry">Customer Inquiry</h2>
+          <form onsubmit="submitInquiry(event)" class="space-y-3 mt-4">
+            <input id="inquiry-name" required placeholder="Name" class="w-full border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="inquiry-phone" required placeholder="Phone" class="w-full border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <textarea id="inquiry-message" required rows="5" placeholder="Message" class="w-full border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700"></textarea>
+            <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
+              <i class="fa-solid fa-paper-plane"></i> Send Inquiry
+            </button>
+          </form>
+        </article>
+      </section>
+
+      <section id="sec-scanner" class="app-section hidden fade-in">
+        <div class="grid lg:grid-cols-2 gap-4">
+          <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <h3 class="font-bold">QR Scanner</h3>
+            <div class="mt-4 min-h-[280px] rounded-2xl bg-slate-950 overflow-hidden flex items-center">
+              <div id="qr-reader" class="w-full"></div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-2 mt-4">
+              <button onclick="startScanner()" class="bg-emerald-600 text-white py-3 rounded-xl font-bold">Camera</button>
+              <label class="cursor-pointer bg-slate-800 text-white py-3 rounded-xl font-bold text-center">
+                Image
+                <input type="file" accept="image/*" class="hidden" onchange="scanImage(event)" />
+              </label>
+            </div>
+          </article>
+
+          <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
+            <h3 class="font-bold">Scan Result</h3>
+            <pre id="scan-result" class="mt-4 min-h-[220px] bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 text-xs whitespace-pre-wrap break-all">ရလဒ်မရှိသေးပါ။</pre>
+            <div id="scan-actions" class="grid sm:grid-cols-2 gap-2 mt-3"></div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </section>
+</main>
+
+<!-- Admin Login -->
+<div id="admin-login-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 p-4">
+  <div class="min-h-full flex items-center justify-center">
+    <div class="w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 p-5 shadow-2xl">
+      <div class="flex justify-between">
+        <h2 class="font-bold text-lg">Admin Login</h2>
+        <button onclick="closeAdminLogin()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="loginAdmin(event)" class="mt-4 space-y-3">
+        <input id="admin-pin" type="password" inputmode="numeric" placeholder="PIN" class="w-full border rounded-xl px-3 py-3 bg-white dark:bg-slate-950 dark:border-slate-700" />
+        <button class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold">Login</button>
+      </form>
+      <p class="text-xs text-slate-500 mt-3">Default PIN: 4545</p>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Editor -->
+<div id="admin-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 p-4 overflow-y-auto">
+  <div class="min-h-full flex items-center justify-center">
+    <div class="w-full max-w-4xl rounded-3xl bg-white dark:bg-slate-900 p-5 shadow-2xl">
+      <div class="flex justify-between items-center">
+        <h2 class="font-bold text-lg">Admin Dashboard</h2>
+        <button onclick="closeAdmin()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-5 mt-4">
+        <form onsubmit="saveProfile(event)" class="space-y-3">
+          <h3 class="font-bold">Profile Settings</h3>
+
+          <label class="text-xs font-bold block">Profile Photo
+            <input id="admin-photo" type="file" accept="image/*" class="mt-1 w-full border rounded-xl p-2 bg-white dark:bg-slate-950 dark:border-slate-700" onchange="readImage(event,'photo')" />
+          </label>
+          <label class="text-xs font-bold block">Cover Photo
+            <input id="admin-cover" type="file" accept="image/*" class="mt-1 w-full border rounded-xl p-2 bg-white dark:bg-slate-950 dark:border-slate-700" onchange="readImage(event,'cover')" />
+          </label>
+          <label class="text-xs font-bold block">Company Logo
+            <input id="admin-logo" type="file" accept="image/*" class="mt-1 w-full border rounded-xl p-2 bg-white dark:bg-slate-950 dark:border-slate-700" onchange="readImage(event,'logo')" />
+          </label>
+
+          <div class="grid sm:grid-cols-2 gap-3">
+            <input id="admin-name" placeholder="Name" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-title" placeholder="Title" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-company" placeholder="Company" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-phone" placeholder="Phone" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-viber" placeholder="Viber" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-email" placeholder="Email" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-website" placeholder="Website" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-facebook" placeholder="Facebook URL" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-telegram" placeholder="Telegram URL" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-tiktok" placeholder="TikTok URL" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-youtube" placeholder="YouTube URL" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-map" placeholder="Google Maps URL" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-kbz" placeholder="KBZ Account" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-wave" placeholder="WavePay" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-aya" placeholder="AYA Pay" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+            <input id="admin-address" placeholder="Address" class="border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+          </div>
+
+          <textarea id="admin-about" rows="3" placeholder="About" class="w-full border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700"></textarea>
+          <button class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold">Save Profile</button>
         </form>
+
+        <div class="space-y-5">
+          <section>
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold">Product Catalog</h3>
+              <button onclick="addProduct()" class="bg-amber-400 text-slate-900 px-3 py-2 rounded-xl text-xs font-bold">+ Add</button>
+            </div>
+            <div id="admin-products" class="space-y-2 mt-3"></div>
+          </section>
+
+          <section>
+            <h3 class="font-bold">Data Management</h3>
+            <div class="grid grid-cols-2 gap-2 mt-3">
+              <button onclick="downloadBackup()" class="bg-slate-800 text-white py-3 rounded-xl font-bold text-sm">Backup</button>
+              <label class="cursor-pointer bg-blue-600 text-white py-3 rounded-xl font-bold text-sm text-center">
+                Restore
+                <input type="file" accept=".json,application/json" class="hidden" onchange="restoreBackup(event)" />
+              </label>
+              <button onclick="exportBookings()" class="bg-emerald-600 text-white py-3 rounded-xl font-bold text-sm">Bookings CSV</button>
+              <button onclick="exportInquiries()" class="bg-purple-600 text-white py-3 rounded-xl font-bold text-sm">Inquiries CSV</button>
+            </div>
+          </section>
+
+          <section>
+            <h3 class="font-bold">Admin PIN</h3>
+            <div class="flex gap-2 mt-3">
+              <input id="new-admin-pin" placeholder="New PIN" class="flex-1 border rounded-xl px-3 py-2.5 bg-white dark:bg-slate-950 dark:border-slate-700" />
+              <button onclick="changeAdminPin()" class="bg-red-600 text-white px-4 rounded-xl font-bold">Change</button>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <div id="toast" class="hidden fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] max-w-[90%] rounded-2xl bg-slate-900 text-white px-5 py-3 shadow-2xl text-sm"></div>
+<div id="toast" class="hidden fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] max-w-[90%] rounded-2xl bg-slate-900 text-white px-5 py-3 shadow-2xl text-sm"></div>
 
 <script>
-const PROFILE_KEY = "perfect_digital_profile_v2";
-const METRICS_KEY = "perfect_digital_metrics_v2";
-const SETTINGS_KEY = "perfect_digital_settings_v2";
-
-const defaultProfile = {
-  name: "Ko Pyae Sone (PYAESONENYEIN)",
-  title: "Founder & Managing Director",
-  company: "Northern World Co., Ltd.",
-  phone: "09264888995",
-  viber: "09784888995",
-  email: "",
-  website: "",
-  facebook: "",
-  telegram: "",
-  kbz: "40251199912610001",
-  wave: "",
-  aya: "",
-  address: "MyothitKyi Quarter, Myitkyina.",
-  about: "Export, Import နှင့် Distribution လုပ်ငန်းများအတွက် Digital Contact Profile ဖြစ်ပါသည်။",
-  photo: "",
-  favorite: true
+const KEYS = {
+  profile:"pdbc_profile_v3",
+  products:"pdbc_products_v3",
+  bookings:"pdbc_bookings_v3",
+  inquiries:"pdbc_inquiries_v3",
+  metrics:"pdbc_metrics_v3",
+  settings:"pdbc_settings_v3",
+  pin:"pdbc_admin_pin_v3"
 };
 
-let profile = loadJSON(PROFILE_KEY, defaultProfile);
-let metrics = loadJSON(METRICS_KEY, { views: 0, saves: 0, scans: 0 });
-let scanner = null;
-let deferredInstallPrompt = null;
+const defaultProfile = {
+  name:"Ko Pyae Sone (PYAESONENYEIN)",
+  title:"Founder & Managing Director",
+  company:"Northern World Co., Ltd.",
+  phone:"09264888995",
+  viber:"09784888995",
+  email:"",
+  website:"",
+  facebook:"",
+  telegram:"",
+  tiktok:"",
+  youtube:"",
+  map:"",
+  kbz:"40251199912610001",
+  wave:"",
+  aya:"",
+  address:"MyothitKyi Quarter, Myitkyina.",
+  about:"Export, Import နှင့် Distribution လုပ်ငန်းများအတွက် Professional Digital Business Card ဖြစ်ပါသည်။",
+  photo:"",
+  cover:"",
+  logo:""
+};
 
-window.addEventListener("beforeinstallprompt", event => {
-  event.preventDefault();
-  deferredInstallPrompt = event;
+const defaultProducts = [
+  {id:uid(),name:"Distribution Service",price:"Contact for price",description:"Multi-category distribution and market channel support.",image:""},
+  {id:uid(),name:"Export & Import Service",price:"Contact for price",description:"Cross-border sourcing, import and export coordination.",image:""}
+];
+
+let profile = load(KEYS.profile, defaultProfile);
+let products = load(KEYS.products, defaultProducts);
+let bookings = load(KEYS.bookings, []);
+let inquiries = load(KEYS.inquiries, []);
+let metrics = load(KEYS.metrics, {views:0,saves:0,scans:0});
+let settings = load(KEYS.settings, {theme:"light",language:"my"});
+let scanner = null;
+let installPrompt = null;
+
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  installPrompt = e;
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  metrics.views += 1;
-  saveJSON(METRICS_KEY, metrics);
+  metrics.views++;
+  save(KEYS.metrics, metrics);
   applyTheme();
-  renderApp();
+  renderAll();
 });
 
-function loadJSON(key, fallback) {
-  try { return JSON.parse(localStorage.getItem(key)) || structuredClone(fallback); }
-  catch { return structuredClone(fallback); }
-}
+function uid(){ return `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
+function load(key,fallback){ try{return JSON.parse(localStorage.getItem(key)) ?? structuredClone(fallback);}catch{return structuredClone(fallback);} }
+function save(key,value){ localStorage.setItem(key,JSON.stringify(value)); }
 
-function saveJSON(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-function renderApp() {
+function renderAll(){
   renderProfile();
   renderQR();
   renderPayments();
+  renderCatalog();
   renderMetrics();
+  renderLanguage();
 }
 
-function renderProfile() {
-  document.getElementById("card-name").textContent = profile.name;
-  document.getElementById("card-title").textContent = profile.title;
-  document.getElementById("card-company").textContent = profile.company;
-  document.getElementById("call-link").href = `tel:${profile.phone}`;
-  document.getElementById("about-text").textContent = profile.about || "—";
+function renderProfile(){
+  byId("profile-name").textContent=profile.name;
+  byId("profile-title").textContent=profile.title;
+  byId("profile-company").textContent=profile.company;
+  byId("call-button").href=`tel:${profile.phone}`;
+  byId("about-text").textContent=profile.about || "—";
 
-  const photo = document.getElementById("profile-photo");
-  const placeholder = document.getElementById("profile-placeholder");
-  if (profile.photo) {
-    photo.src = profile.photo;
-    photo.classList.remove("hidden");
-    placeholder.classList.add("hidden");
-  } else {
-    photo.classList.add("hidden");
-    placeholder.classList.remove("hidden");
-  }
+  setImage("profile-photo","profile-placeholder",profile.photo);
+  setImage("company-logo","logo-placeholder",profile.logo);
 
-  document.getElementById("favorite-icon").className =
-    profile.favorite ? "fa-solid fa-star text-amber-400" : "fa-regular fa-star";
+  const cover=byId("cover-image");
+  if(profile.cover){ cover.src=profile.cover; cover.classList.remove("hidden"); }
+  else cover.classList.add("hidden");
 
-  const details = [
-    ["fa-phone", "ဖုန်း", profile.phone],
-    ["fa-comments", "Viber", profile.viber],
-    ["fa-envelope", "Email", profile.email],
-    ["fa-globe", "Website", profile.website],
-    ["fa-location-dot", "လိပ်စာ", profile.address]
-  ].filter(item => item[2]);
+  const map=byId("map-link");
+  if(profile.map){ map.href=normalizeLink(profile.map); map.classList.remove("hidden"); }
+  else map.classList.add("hidden");
 
-  document.getElementById("contact-details").innerHTML = details.map(item => `
+  const info=[
+    ["fa-phone","Phone",profile.phone],
+    ["fa-comments","Viber",profile.viber],
+    ["fa-envelope","Email",profile.email],
+    ["fa-globe","Website",profile.website],
+    ["fa-location-dot","Address",profile.address]
+  ].filter(x=>x[2]);
+
+  byId("contact-info").innerHTML=info.map(x=>`
     <div class="flex items-start gap-3">
       <div class="h-9 w-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center shrink-0">
-        <i class="fa-solid ${item[0]}"></i>
+        <i class="fa-solid ${x[0]}"></i>
       </div>
-      <div>
-        <p class="text-[11px] text-slate-400">${item[1]}</p>
-        <p class="text-sm font-bold break-all">${escapeHTML(item[2])}</p>
-      </div>
-    </div>
-  `).join("");
+      <div><p class="text-[11px] text-slate-400">${x[1]}</p><p class="text-sm font-bold break-all">${esc(x[2])}</p></div>
+    </div>`).join("");
 
-  const socials = [
-    ["fa-brands fa-facebook-f", profile.facebook],
-    ["fa-brands fa-telegram", profile.telegram],
-    ["fa-solid fa-globe", profile.website],
-    ["fa-brands fa-viber", profile.viber ? `viber://chat?number=${profile.viber}` : ""]
-  ].filter(item => item[1]);
+  const socials=[
+    ["fa-brands fa-facebook-f",profile.facebook],
+    ["fa-brands fa-telegram",profile.telegram],
+    ["fa-brands fa-tiktok",profile.tiktok],
+    ["fa-brands fa-youtube",profile.youtube],
+    ["fa-solid fa-globe",profile.website],
+    ["fa-brands fa-viber",profile.viber?`viber://chat?number=${profile.viber}`:""]
+  ].filter(x=>x[1]);
 
-  document.getElementById("social-links").innerHTML = socials.map(item => `
-    <a href="${normalizeLink(item[1])}" target="_blank" rel="noopener"
-       class="h-11 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-      <i class="${item[0]}"></i>
-    </a>
-  `).join("");
+  byId("social-buttons").innerHTML=socials.slice(0,8).map(x=>`
+    <a href="${normalizeLink(x[1])}" target="_blank" rel="noopener"
+      class="h-11 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+      <i class="${x[0]}"></i>
+    </a>`).join("");
 }
 
-function renderMetrics() {
-  document.getElementById("views-count").textContent = metrics.views;
-  document.getElementById("save-count").textContent = metrics.saves;
-  document.getElementById("scan-count").textContent = metrics.scans;
+function setImage(imgId,placeholderId,data){
+  const img=byId(imgId),ph=byId(placeholderId);
+  if(data){img.src=data;img.classList.remove("hidden");ph.classList.add("hidden");}
+  else{img.classList.add("hidden");ph.classList.remove("hidden");}
 }
 
-function renderQR() {
-  const box = document.getElementById("profile-qr");
-  box.innerHTML = "";
-  new QRCode(box, {
-    text: generateVCard(),
-    width: 250,
-    height: 250,
-    colorDark: "#064e3b",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.M
-  });
+function renderQR(){
+  const box=byId("main-qr"); box.innerHTML="";
+  new QRCode(box,{text:vcard(),width:250,height:250,colorDark:"#064e3b",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.M});
 }
 
-function renderPayments() {
-  const payments = [
-    { name:"KBZ Bank", value:profile.kbz, icon:"fa-building-columns", note:"KBZ Special Account" },
-    { name:"WavePay", value:profile.wave, icon:"fa-mobile-screen-button", note:"WavePay Account" },
-    { name:"AYA Pay", value:profile.aya, icon:"fa-wallet", note:"AYA Pay Account" }
-  ].filter(p => p.value);
+function renderPayments(){
+  const items=[
+    ["KBZ Bank",profile.kbz,"fa-building-columns"],
+    ["WavePay",profile.wave,"fa-mobile-screen-button"],
+    ["AYA Pay",profile.aya,"fa-wallet"]
+  ].filter(x=>x[1]);
 
-  document.getElementById("payment-grid").innerHTML = payments.length ? payments.map(p => `
+  byId("payments-grid").innerHTML=items.length?items.map(x=>`
     <article class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
       <div class="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center text-xl">
-        <i class="fa-solid ${p.icon}"></i>
+        <i class="fa-solid ${x[2]}"></i>
       </div>
-      <h3 class="font-bold mt-4">${p.name}</h3>
-      <p class="text-xs text-slate-500">${p.note}</p>
-      <p class="font-mono font-bold mt-3 break-all">${escapeHTML(p.value)}</p>
-      <button onclick="copyText('${encodeURIComponent(p.value)}')" class="w-full mt-4 bg-slate-100 dark:bg-slate-800 py-3 rounded-xl font-bold text-sm">
-        <i class="fa-solid fa-copy"></i> Copy
-      </button>
-    </article>
-  `).join("") : `
-    <div class="md:col-span-2 xl:col-span-3 rounded-3xl bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 p-10 text-center">
-      <i class="fa-solid fa-wallet text-4xl text-slate-300"></i>
-      <p class="font-bold mt-3">Payment Account မထည့်ရသေးပါ</p>
-    </div>
-  `;
+      <h3 class="font-bold mt-4">${x[0]}</h3>
+      <p class="font-mono font-bold mt-3 break-all">${esc(x[1])}</p>
+      <button onclick="copyEncoded('${encodeURIComponent(x[1])}')" class="w-full mt-4 bg-slate-100 dark:bg-slate-800 py-3 rounded-xl font-bold">Copy</button>
+    </article>`).join(""):`<p class="text-slate-500">Payment account မရှိသေးပါ။</p>`;
 }
 
-function switchTab(tab) {
-  document.querySelectorAll(".app-section").forEach(el => el.classList.add("hidden"));
-  document.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.className = "tab-btn px-4 py-3 rounded-2xl font-bold text-sm";
-  });
-  document.getElementById(`sec-${tab}`).classList.remove("hidden");
-  document.getElementById(`tab-${tab}`).className = "tab-btn bg-emerald-600 text-white px-4 py-3 rounded-2xl font-bold text-sm";
-  if (tab !== "scanner") stopScanner();
+function renderCatalog(){
+  byId("catalog-grid").innerHTML=products.length?products.map(p=>`
+    <article class="rounded-3xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+      <div class="h-44 bg-slate-200 dark:bg-slate-800">
+        ${p.image?`<img src="${p.image}" class="w-full h-full object-cover">`:`<div class="w-full h-full flex items-center justify-center text-4xl text-slate-400"><i class="fa-solid fa-box"></i></div>`}
+      </div>
+      <div class="p-5">
+        <h3 class="font-bold text-lg">${esc(p.name)}</h3>
+        <p class="text-emerald-600 font-bold mt-1">${esc(p.price)}</p>
+        <p class="text-sm text-slate-500 mt-3">${esc(p.description)}</p>
+        <button onclick="inquireProduct('${p.id}')" class="w-full mt-4 bg-emerald-600 text-white py-3 rounded-xl font-bold">Inquiry</button>
+      </div>
+    </article>`).join(""):`<p class="text-slate-500">Product မရှိသေးပါ။</p>`;
 }
 
-function openEditor() {
-  const fields = ["name","title","company","phone","viber","email","website","facebook","telegram","kbz","wave","aya","address","about"];
-  fields.forEach(key => document.getElementById(`field-${key}`).value = profile[key] || "");
-  document.getElementById("editor-modal").classList.remove("hidden");
+function renderMetrics(){
+  byId("metric-views").textContent=metrics.views;
+  byId("metric-saves").textContent=metrics.saves;
+  byId("metric-scans").textContent=metrics.scans;
 }
 
-function closeEditor() {
-  document.getElementById("editor-modal").classList.add("hidden");
+function switchTab(tab){
+  document.querySelectorAll(".app-section").forEach(x=>x.classList.add("hidden"));
+  document.querySelectorAll(".tab-btn").forEach(x=>x.className="tab-btn px-4 py-3 rounded-2xl font-bold text-sm");
+  byId(`sec-${tab}`).classList.remove("hidden");
+  byId(`tab-${tab}`).className="tab-btn bg-emerald-600 text-white px-4 py-3 rounded-2xl font-bold text-sm";
+  if(tab!=="scanner")stopScanner();
 }
 
-function previewPhoto(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => { profile.photo = reader.result; };
-  reader.readAsDataURL(file);
+function escV(value){return String(value||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");}
+function vcard(){
+  const l=["BEGIN:VCARD","VERSION:3.0",`FN:${escV(profile.name)}`,`N:;${escV(profile.name)};;;`,`TEL;TYPE=CELL,VOICE:${profile.phone}`];
+  if(profile.viber)l.push(`TEL;TYPE=WORK,VOICE:${profile.viber}`);
+  if(profile.email)l.push(`EMAIL:${profile.email}`);
+  if(profile.company)l.push(`ORG:${escV(profile.company)}`);
+  if(profile.title)l.push(`TITLE:${escV(profile.title)}`);
+  if(profile.website)l.push(`URL:${profile.website}`);
+  if(profile.address)l.push(`ADR;TYPE=WORK:;;${escV(profile.address)};;;;`);
+  const note=[profile.kbz?`KBZ: ${profile.kbz}`:"",profile.wave?`WavePay: ${profile.wave}`:"",profile.aya?`AYA Pay: ${profile.aya}`:"",profile.about].filter(Boolean).join("\n");
+  if(note)l.push(`NOTE:${escV(note)}`);
+  l.push("END:VCARD"); return l.join("\r\n");
 }
 
-function saveProfile(event) {
-  event.preventDefault();
-  const fields = ["name","title","company","phone","viber","email","website","facebook","telegram","kbz","wave","aya","address","about"];
-  fields.forEach(key => profile[key] = document.getElementById(`field-${key}`).value.trim());
-  saveJSON(PROFILE_KEY, profile);
-  closeEditor();
-  renderApp();
-  showToast("Profile သိမ်းပြီးပါပြီ။");
+function downloadVCard(){
+  downloadBlob(new Blob([vcard()],{type:"text/vcard;charset=utf-8"}),`${safe(profile.name)}.vcf`);
+  metrics.saves++;save(KEYS.metrics,metrics);renderMetrics();toast("Contact သိမ်းပြီးပါပြီ။");
 }
 
-function toggleFavorite() {
-  profile.favorite = !profile.favorite;
-  saveJSON(PROFILE_KEY, profile);
-  renderProfile();
+async function shareProfile(){
+  const file=new File([vcard()],`${safe(profile.name)}.vcf`,{type:"text/vcard"});
+  try{
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]}))await navigator.share({title:profile.name,text:profile.company,files:[file]});
+    else if(navigator.share)await navigator.share({title:profile.name,text:summary()});
+    else{await clipboard(summary());toast("Profile ကို Copy ကူးပြီးပါပြီ။");}
+  }catch(e){if(e.name!=="AbortError")toast("Share မလုပ်နိုင်ပါ။");}
 }
 
-function escVCard(value) {
-  return String(value || "").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");
+function summary(){return [`Name: ${profile.name}`,`Title: ${profile.title}`,`Company: ${profile.company}`,`Phone: ${profile.phone}`,`Viber: ${profile.viber}`,`Address: ${profile.address}`].join("\n");}
+async function copyProfile(){await clipboard(summary());toast("Copy ကူးပြီးပါပြီ။");}
+async function copyVCard(){await clipboard(vcard());toast("vCard Copy ကူးပြီးပါပြီ။");}
+async function copyEncoded(v){await clipboard(decodeURIComponent(v));toast("Copy ကူးပြီးပါပြီ။");}
+
+function downloadQR(){
+  const c=document.querySelector("#main-qr canvas"),i=document.querySelector("#main-qr img");
+  if(!c&&!i)return;const a=document.createElement("a");a.download=`${safe(profile.name)}-qr.png`;a.href=c?c.toDataURL("image/png"):i.src;a.click();
 }
 
-function generateVCard() {
-  const lines = [
-    "BEGIN:VCARD",
-    "VERSION:3.0",
-    `FN:${escVCard(profile.name)}`,
-    `N:;${escVCard(profile.name)};;;`,
-    `TEL;TYPE=CELL,VOICE:${profile.phone}`
-  ];
-  if (profile.viber) lines.push(`TEL;TYPE=WORK,VOICE:${profile.viber}`);
-  if (profile.email) lines.push(`EMAIL;TYPE=INTERNET:${profile.email}`);
-  if (profile.company) lines.push(`ORG:${escVCard(profile.company)}`);
-  if (profile.title) lines.push(`TITLE:${escVCard(profile.title)}`);
-  if (profile.website) lines.push(`URL:${profile.website}`);
-  if (profile.address) lines.push(`ADR;TYPE=WORK:;;${escVCard(profile.address)};;;;`);
-
-  const note = [
-    profile.kbz ? `KBZ Account: ${profile.kbz}` : "",
-    profile.wave ? `WavePay: ${profile.wave}` : "",
-    profile.aya ? `AYA Pay: ${profile.aya}` : "",
-    profile.about || ""
-  ].filter(Boolean).join("\n");
-  if (note) lines.push(`NOTE:${escVCard(note)}`);
-  lines.push("END:VCARD");
-  return lines.join("\r\n");
+function inquireProduct(id){
+  const p=products.find(x=>x.id===id); if(!p)return;
+  switchTab("inquiry");
+  byId("inquiry-message").value=`I am interested in: ${p.name}`;
 }
 
-function safeName(name) {
-  return (name || "contact").replace(/[<>:"/\\|?*]+/g,"").replace(/\s+/g,"_");
+function submitBooking(e){
+  e.preventDefault();
+  const item={id:uid(),name:byId("booking-name").value,phone:byId("booking-phone").value,date:byId("booking-date").value,time:byId("booking-time").value,note:byId("booking-note").value,createdAt:new Date().toISOString()};
+  bookings.push(item);save(KEYS.bookings,bookings);e.target.reset();toast("Booking သိမ်းပြီးပါပြီ။");
 }
 
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1200);
+function submitInquiry(e){
+  e.preventDefault();
+  const item={id:uid(),name:byId("inquiry-name").value,phone:byId("inquiry-phone").value,message:byId("inquiry-message").value,createdAt:new Date().toISOString()};
+  inquiries.push(item);save(KEYS.inquiries,inquiries);e.target.reset();toast("Inquiry သိမ်းပြီးပါပြီ။");
 }
 
-function downloadVCard() {
-  downloadBlob(new Blob([generateVCard()], {type:"text/vcard;charset=utf-8"}), `${safeName(profile.name)}.vcf`);
-  metrics.saves += 1;
-  saveJSON(METRICS_KEY, metrics);
-  renderMetrics();
-  showToast(".VCF Contact သိမ်းပြီးပါပြီ။");
-}
-
-async function shareProfile() {
-  const file = new File([generateVCard()], `${safeName(profile.name)}.vcf`, {type:"text/vcard"});
-  try {
-    if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-      await navigator.share({title:profile.name, text:profile.company, files:[file]});
-    } else if (navigator.share) {
-      await navigator.share({title:profile.name, text:profileSummary()});
-    } else {
-      await clipboard(profileSummary());
-      showToast("Profile အချက်အလက်ကို ကူးယူပြီးပါပြီ။");
-    }
-  } catch (error) {
-    if (error.name !== "AbortError") showToast("Share မလုပ်နိုင်ပါ။");
-  }
-}
-
-function profileSummary() {
-  return [
-    `အမည်: ${profile.name}`,
-    `ရာထူး: ${profile.title}`,
-    `Company: ${profile.company}`,
-    `ဖုန်း: ${profile.phone}`,
-    `Viber: ${profile.viber}`,
-    `Email: ${profile.email}`,
-    `Website: ${profile.website}`,
-    `လိပ်စာ: ${profile.address}`
-  ].filter(line => !line.endsWith(": ")).join("\n");
-}
-
-async function copyProfileText() {
-  await clipboard(profileSummary());
-  showToast("Profile ကို Copy ကူးပြီးပါပြီ။");
-}
-
-async function copyVCard() {
-  await clipboard(generateVCard());
-  showToast("vCard Data ကို Copy ကူးပြီးပါပြီ။");
-}
-
-async function copyText(encoded) {
-  await clipboard(decodeURIComponent(encoded));
-  showToast("Copy ကူးပြီးပါပြီ။");
-}
-
-async function clipboard(text) {
-  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
-  const area = document.createElement("textarea");
-  area.value = text;
-  area.style.position = "fixed";
-  area.style.opacity = "0";
-  document.body.appendChild(area);
-  area.select();
-  document.execCommand("copy");
-  area.remove();
-}
-
-function downloadQR() {
-  const canvas = document.querySelector("#profile-qr canvas");
-  const img = document.querySelector("#profile-qr img");
-  if (!canvas && !img) return;
-  const a = document.createElement("a");
-  a.download = `${safeName(profile.name)}-qr.png`;
-  a.href = canvas ? canvas.toDataURL("image/png") : img.src;
-  a.click();
-  showToast("QR PNG သိမ်းပြီးပါပြီ။");
-}
-
-async function startScanner() {
-  if (!window.isSecureContext) {
-    showToast("Camera သုံးရန် HTTPS ဖြင့်ဖွင့်ပါ။");
-    return;
-  }
+async function startScanner(){
+  if(!window.isSecureContext){toast("HTTPS ဖြင့်ဖွင့်ပါ။");return;}
   await stopScanner();
-  scanner = new Html5QrcodeScanner("qr-reader", {
-    fps:10, qrbox:{width:230,height:230}, rememberLastUsedCamera:true, showTorchButtonIfSupported:true
-  }, false);
-  scanner.render(async text => {
-    showScanResult(text);
-    await stopScanner();
-  }, () => {});
+  scanner=new Html5QrcodeScanner("qr-reader",{fps:10,qrbox:{width:230,height:230},rememberLastUsedCamera:true,showTorchButtonIfSupported:true},false);
+  scanner.render(async t=>{scanResult(t);await stopScanner();},()=>{});
+}
+async function stopScanner(){if(!scanner)return;try{await scanner.clear();}catch{}scanner=null;const r=byId("qr-reader");if(r)r.innerHTML="";}
+async function scanImage(e){
+  const f=e.target.files?.[0];if(!f)return;
+  let h=byId("file-scanner");if(!h){h=document.createElement("div");h.id="file-scanner";h.style.display="none";document.body.appendChild(h);}
+  const r=new Html5Qrcode("file-scanner");
+  try{scanResult(await r.scanFile(f,true));}catch{toast("QR Code မတွေ့ပါ။");}finally{try{await r.clear();}catch{}e.target.value="";}
+}
+function scanResult(t){
+  byId("scan-result").textContent=t;metrics.scans++;save(KEYS.metrics,metrics);renderMetrics();
+  byId("scan-actions").innerHTML=`<button onclick="copyScan()" class="bg-slate-800 text-white py-3 rounded-xl font-bold">Copy</button>`+(t.trim().toUpperCase().startsWith("BEGIN:VCARD")?`<button onclick="saveScanVCF()" class="bg-emerald-600 text-white py-3 rounded-xl font-bold">VCF Save</button>`:"");
+}
+async function copyScan(){await clipboard(byId("scan-result").textContent);toast("Copy ကူးပြီးပါပြီ။");}
+function saveScanVCF(){downloadBlob(new Blob([byId("scan-result").textContent],{type:"text/vcard;charset=utf-8"}),"scanned-contact.vcf");}
+
+function openAdmin(){byId("admin-login-modal").classList.remove("hidden");}
+function closeAdminLogin(){byId("admin-login-modal").classList.add("hidden");}
+function loginAdmin(e){
+  e.preventDefault();
+  const pin=localStorage.getItem(KEYS.pin)||"4545";
+  if(byId("admin-pin").value!==pin){toast("PIN မှားနေပါသည်။");return;}
+  closeAdminLogin();fillAdmin();byId("admin-modal").classList.remove("hidden");byId("admin-pin").value="";
+}
+function closeAdmin(){byId("admin-modal").classList.add("hidden");}
+
+function fillAdmin(){
+  ["name","title","company","phone","viber","email","website","facebook","telegram","tiktok","youtube","map","kbz","wave","aya","address","about"].forEach(k=>byId(`admin-${k}`).value=profile[k]||"");
+  renderAdminProducts();
+}
+function saveProfile(e){
+  e.preventDefault();
+  ["name","title","company","phone","viber","email","website","facebook","telegram","tiktok","youtube","map","kbz","wave","aya","address","about"].forEach(k=>profile[k]=byId(`admin-${k}`).value.trim());
+  save(KEYS.profile,profile);renderAll();toast("Profile သိမ်းပြီးပါပြီ။");
+}
+function readImage(e,type){
+  const f=e.target.files?.[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{profile[type]=r.result;save(KEYS.profile,profile);renderAll();};r.readAsDataURL(f);
+}
+function renderAdminProducts(){
+  byId("admin-products").innerHTML=products.map((p,i)=>`
+    <div class="border border-slate-200 dark:border-slate-700 rounded-xl p-3 space-y-2">
+      <input value="${esc(p.name)}" onchange="updateProduct(${i},'name',this.value)" class="w-full border rounded-lg px-2 py-2 bg-white dark:bg-slate-950 dark:border-slate-700">
+      <input value="${esc(p.price)}" onchange="updateProduct(${i},'price',this.value)" class="w-full border rounded-lg px-2 py-2 bg-white dark:bg-slate-950 dark:border-slate-700">
+      <textarea onchange="updateProduct(${i},'description',this.value)" class="w-full border rounded-lg px-2 py-2 bg-white dark:bg-slate-950 dark:border-slate-700">${esc(p.description)}</textarea>
+      <label class="block text-xs">Image<input type="file" accept="image/*" onchange="productImage(event,${i})" class="block mt-1"></label>
+      <button onclick="removeProduct(${i})" class="w-full bg-red-600 text-white py-2 rounded-lg font-bold">Delete</button>
+    </div>`).join("");
+}
+function addProduct(){products.push({id:uid(),name:"New Product",price:"Contact for price",description:"",image:""});save(KEYS.products,products);renderAdminProducts();renderCatalog();}
+function updateProduct(i,k,v){products[i][k]=v;save(KEYS.products,products);renderCatalog();}
+function removeProduct(i){products.splice(i,1);save(KEYS.products,products);renderAdminProducts();renderCatalog();}
+function productImage(e,i){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{products[i].image=r.result;save(KEYS.products,products);renderCatalog();};r.readAsDataURL(f);}
+
+function changeAdminPin(){
+  const p=byId("new-admin-pin").value.trim();
+  if(p.length<4){toast("PIN အနည်းဆုံး 4 လုံးထည့်ပါ။");return;}
+  localStorage.setItem(KEYS.pin,p);byId("new-admin-pin").value="";toast("PIN ပြောင်းပြီးပါပြီ။");
 }
 
-async function stopScanner() {
-  if (!scanner) return;
-  try { await scanner.clear(); } catch {}
-  scanner = null;
-  const reader = document.getElementById("qr-reader");
-  if (reader) reader.innerHTML = "";
+function exportBookings(){exportCSV(bookings,"bookings.csv");}
+function exportInquiries(){exportCSV(inquiries,"inquiries.csv");}
+function exportCSV(rows,name){
+  if(!rows.length){toast("Data မရှိပါ။");return;}
+  const keys=Object.keys(rows[0]);const csv="\uFEFF"+[keys.join(","),...rows.map(r=>keys.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`).join(","))].join("\r\n");
+  downloadBlob(new Blob([csv],{type:"text/csv;charset=utf-8"}),name);
+}
+function downloadBackup(){
+  const data={version:3,profile,products,bookings,inquiries,metrics,settings};
+  downloadBlob(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),`pdbc-backup-${new Date().toISOString().slice(0,10)}.json`);
+}
+async function restoreBackup(e){
+  const f=e.target.files?.[0];if(!f)return;
+  try{
+    const d=JSON.parse(await f.text());
+    profile=d.profile||profile;products=d.products||products;bookings=d.bookings||[];inquiries=d.inquiries||[];metrics=d.metrics||metrics;settings=d.settings||settings;
+    save(KEYS.profile,profile);save(KEYS.products,products);save(KEYS.bookings,bookings);save(KEYS.inquiries,inquiries);save(KEYS.metrics,metrics);save(KEYS.settings,settings);
+    applyTheme();renderAll();fillAdmin();toast("Restore ပြီးပါပြီ။");
+  }catch{toast("Backup ဖိုင်မမှန်ပါ။");}
+  e.target.value="";
 }
 
-async function scanImage(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  let holder = document.getElementById("file-scanner");
-  if (!holder) {
-    holder = document.createElement("div");
-    holder.id = "file-scanner";
-    holder.style.display = "none";
-    document.body.appendChild(holder);
-  }
-  const reader = new Html5Qrcode("file-scanner");
-  try {
-    const text = await reader.scanFile(file, true);
-    showScanResult(text);
-  } catch {
-    showToast("ပုံထဲတွင် QR Code မတွေ့ပါ။");
-  } finally {
-    try { await reader.clear(); } catch {}
-    event.target.value = "";
-  }
+function toggleTheme(){settings.theme=document.documentElement.classList.contains("dark")?"light":"dark";save(KEYS.settings,settings);applyTheme();}
+function applyTheme(){const d=settings.theme==="dark";document.documentElement.classList.toggle("dark",d);byId("theme-icon").className=d?"fa-solid fa-sun":"fa-solid fa-moon";}
+function toggleLanguage(){settings.language=settings.language==="my"?"en":"my";save(KEYS.settings,settings);renderLanguage();}
+function renderLanguage(){
+  byId("lang-label").textContent=settings.language==="my"?"EN":"MY";
+  const t={
+    my:{call:"ဖုန်းခေါ်မည်",saveContact:"Contact Save",quickActions:"အမြန်လုပ်ဆောင်ချက်များ",views:"Profile Views",saves:"Contact Saves",scans:"QR Scans",contactInfo:"Contact အချက်အလက်",catalog:"Product Catalog",catalogDesc:"ကုန်ပစ္စည်းနှင့် ဝန်ဆောင်မှုများ",booking:"Appointment Booking",inquiry:"Customer Inquiry"},
+    en:{call:"Call Now",saveContact:"Save Contact",quickActions:"Quick Actions",views:"Profile Views",saves:"Contact Saves",scans:"QR Scans",contactInfo:"Contact Information",catalog:"Product Catalog",catalogDesc:"Products and services",booking:"Appointment Booking",inquiry:"Customer Inquiry"}
+  }[settings.language];
+  document.querySelectorAll("[data-i18n]").forEach(el=>{if(t[el.dataset.i18n])el.textContent=t[el.dataset.i18n];});
 }
+async function installApp(){if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;}else toast("Browser Menu မှ Add to Home Screen ကိုရွေးပါ။");}
 
-function showScanResult(text) {
-  document.getElementById("scan-result").textContent = text;
-  metrics.scans += 1;
-  saveJSON(METRICS_KEY, metrics);
-  renderMetrics();
-
-  const box = document.getElementById("scan-actions");
-  box.innerHTML = `
-    <button onclick="copyScanned()" class="bg-slate-800 text-white py-3 rounded-xl font-bold">
-      <i class="fa-solid fa-copy"></i> Copy
-    </button>
-  `;
-  if (text.trim().toUpperCase().startsWith("BEGIN:VCARD")) {
-    box.innerHTML += `
-      <button onclick="downloadScannedVCard()" class="bg-emerald-600 text-white py-3 rounded-xl font-bold">
-        <i class="fa-solid fa-address-card"></i> VCF Save
-      </button>
-    `;
-  }
-  showToast("QR Code ဖတ်ပြီးပါပြီ။");
-}
-
-async function copyScanned() {
-  await clipboard(document.getElementById("scan-result").textContent);
-  showToast("Scan Result ကို Copy ကူးပြီးပါပြီ။");
-}
-
-function downloadScannedVCard() {
-  const text = document.getElementById("scan-result").textContent;
-  downloadBlob(new Blob([text], {type:"text/vcard;charset=utf-8"}), "scanned-contact.vcf");
-}
-
-function downloadBackup() {
-  const backup = {
-    version:2,
-    exportedAt:new Date().toISOString(),
-    profile,
-    metrics,
-    settings:loadJSON(SETTINGS_KEY,{})
-  };
-  downloadBlob(new Blob([JSON.stringify(backup,null,2)], {type:"application/json"}), `perfect-contact-backup-${new Date().toISOString().slice(0,10)}.json`);
-  showToast("Backup သိမ်းပြီးပါပြီ။");
-}
-
-async function restoreBackup(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  try {
-    const backup = JSON.parse(await file.text());
-    if (!backup.profile) throw new Error("Invalid");
-    profile = backup.profile;
-    metrics = backup.metrics || {views:0,saves:0,scans:0};
-    saveJSON(PROFILE_KEY, profile);
-    saveJSON(METRICS_KEY, metrics);
-    if (backup.settings) saveJSON(SETTINGS_KEY, backup.settings);
-    applyTheme();
-    renderApp();
-    showToast("Backup Restore ပြီးပါပြီ။");
-  } catch {
-    showToast("Backup ဖိုင်မမှန်ပါ။");
-  }
-  event.target.value = "";
-}
-
-function resetApp() {
-  if (!confirm("App data အားလုံးကို Reset လုပ်မည်လား?")) return;
-  localStorage.removeItem(PROFILE_KEY);
-  localStorage.removeItem(METRICS_KEY);
-  localStorage.removeItem(SETTINGS_KEY);
-  profile = structuredClone(defaultProfile);
-  metrics = {views:1,saves:0,scans:0};
-  saveJSON(PROFILE_KEY, profile);
-  saveJSON(METRICS_KEY, metrics);
-  applyTheme();
-  renderApp();
-  showToast("App Reset ပြီးပါပြီ။");
-}
-
-function toggleTheme() {
-  const dark = !document.documentElement.classList.contains("dark");
-  document.documentElement.classList.toggle("dark", dark);
-  saveJSON(SETTINGS_KEY, {theme: dark ? "dark" : "light"});
-  document.getElementById("theme-icon").className = dark ? "fa-solid fa-sun" : "fa-solid fa-moon";
-}
-
-function applyTheme() {
-  const settings = loadJSON(SETTINGS_KEY, {});
-  const dark = settings.theme === "dark";
-  document.documentElement.classList.toggle("dark", dark);
-  document.getElementById("theme-icon").className = dark ? "fa-solid fa-sun" : "fa-solid fa-moon";
-}
-
-async function installPWA() {
-  if (!deferredInstallPrompt) {
-    showToast("Browser Menu မှ Add to Home Screen ကိုရွေးပါ။");
-    return;
-  }
-  deferredInstallPrompt.prompt();
-  await deferredInstallPrompt.userChoice;
-  deferredInstallPrompt = null;
-}
-
-function normalizeLink(value) {
-  if (!value) return "#";
-  if (value.startsWith("viber://") || value.startsWith("tel:") || value.startsWith("mailto:")) return value;
-  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
-}
-
-function escapeHTML(value) {
-  return String(value ?? "")
-    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-}
-
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.classList.remove("hidden");
-  clearTimeout(window.toastTimer);
-  window.toastTimer = setTimeout(() => toast.classList.add("hidden"), 2600);
-}
+function normalizeLink(v){if(!v)return"#";if(/^(viber:|tel:|mailto:)/i.test(v))return v;return /^https?:\/\//i.test(v)?v:`https://${v}`;}
+function safe(v){return(v||"file").replace(/[<>:"/\\|?*]+/g,"").replace(/\s+/g,"_");}
+function downloadBlob(b,n){const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1200);}
+async function clipboard(t){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(t);const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();}
+function byId(id){return document.getElementById(id);}
+function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
+function toast(m){const t=byId("toast");t.textContent=m;t.classList.remove("hidden");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.add("hidden"),2600);}
 </script>
 </body>
 </html>
